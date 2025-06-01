@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>E-book Dashboard</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        margin: 0;
+        padding: 20px;
+        color: white;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .container {
+        background: rgba(255, 255, 255, 0.95);
+        color: #333;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+      }
+      .logo {
+        font-size: 48px;
+        margin-bottom: 15px;
+      }
+      h1 {
+        margin-bottom: 20px;
+        color: #2c3e50;
+        font-size: 24px;
+      }
+      .status {
+        background: #28a745;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-size: 12px;
+        margin-bottom: 25px;
+        display: inline-block;
+      }
+      .launch-btn {
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+      .launch-btn:hover {
+        transform: translateY(-2px);
+      }
+      .launch-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .internal {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+      .browser {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+      }
+      .embed {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+      }
+      .menu-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .menu-btn {
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 12px;
+        background: #f8f9fa;
+        color: #495057;
+        transition: all 0.2s;
+      }
+      .menu-btn:hover {
+        background: #e9ecef;
+        transform: translateY(-1px);
+      }
+      .spinner {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top: 2px solid white;
+        border-radius: 50%;
+        width: 12px;
+        height: 12px;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+        margin-right: 6px;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="logo">📚</div>
+      <h1>E-book Dashboard</h1>
+      <div class="status">✅ Licensed & Active</div>
+
+      <button class="launch-btn internal" id="btn-internal">
+        📖 Open Internal Window
+      </button>
+
+      <button class="launch-btn browser" id="btn-browser">
+        🌐 Open in Browser
+      </button>
+
+      <div class="menu-grid">
+        <button class="menu-btn" id="btn-info">ℹ️ License Info</button>
+        <button class="menu-btn" id="btn-settings">⚙️ Settings</button>
+        <button class="menu-btn" id="btn-reset">🔄 Reset License</button>
+        <button class="menu-btn" id="btn-exit">❌ Exit App</button>
+      </div>
+    </div>
+
+    <script>
+      console.log("📊 Dashboard script starting...");
+
+      let isLaunching = false;
+
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log("📄 DOM loaded");
+        initializeDashboard();
+      });
+
+      function initializeDashboard() {
+        console.log("🔧 Initializing dashboard...");
+
+        if (!window.electronAPI) {
+          console.error("❌ Electron API not available");
+          alert("Error: Electron API not available");
+          return;
+        }
+
+        console.log("✅ Electron API available");
+        setupEventListeners();
+      }
+
+      function setupEventListeners() {
+        console.log("🎯 Setting up event listeners...");
+
+        // Launch buttons
+        document
+          .getElementById("btn-internal")
+          .addEventListener("click", handleInternalLaunch);
+        document
+          .getElementById("btn-browser")
+          .addEventListener("click", handleBrowserLaunch);
+        document
+          .getElementById("btn-embed")
+          .addEventListener("click", handleEmbedLaunch);
+
+        // Menu buttons
+        document.getElementById("btn-info").addEventListener("click", showInfo);
+        document
+          .getElementById("btn-settings")
+          .addEventListener("click", showSettings);
+        document
+          .getElementById("btn-reset")
+          .addEventListener("click", resetLicense);
+        document.getElementById("btn-exit").addEventListener("click", exitApp);
+
+        console.log("✅ All event listeners set up");
+      }
+
+      async function handleInternalLaunch() {
+        console.log("🏠 Internal launch button clicked!");
+
+        if (isLaunching) return;
+
+        const btn = document.getElementById("btn-internal");
+
+        try {
+          isLaunching = true;
+          btn.disabled = true;
+          btn.innerHTML = '<div class="spinner"></div>Opening...';
+
+          const result = await window.electronAPI.launchEbookInternal();
+
+          if (result.success) {
+            btn.innerHTML = "✅ E-book Opened!";
+            btn.style.background =
+              "linear-gradient(135deg, #28a745 0%, #20c997 100%)";
+
+            setTimeout(() => {
+              btn.innerHTML = "📖 Open Internal Window";
+              btn.style.background =
+                "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
+              btn.disabled = false;
+              isLaunching = false;
+            }, 3000);
+          } else {
+            alert("Launch failed: " + result.message);
+            resetButton(btn, "📖 Open Internal Window");
+          }
+        } catch (error) {
+          alert("Launch error: " + error.message);
+          resetButton(btn, "📖 Open Internal Window");
+        }
+      }
+
+      async function handleBrowserLaunch() {
+        console.log("🌐 Browser launch button clicked!");
+
+        if (isLaunching) return;
+
+        const btn = document.getElementById("btn-browser");
+
+        try {
+          isLaunching = true;
+          btn.disabled = true;
+          btn.innerHTML = '<div class="spinner"></div>Opening...';
+
+          const result = await window.electronAPI.launchEbookBrowser();
+
+          if (result.success) {
+            btn.innerHTML = "✅ Opened in Browser!";
+            btn.style.background =
+              "linear-gradient(135deg, #28a745 0%, #20c997 100%)";
+
+            setTimeout(() => {
+              btn.innerHTML = "🌐 Open in Browser";
+              btn.style.background =
+                "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)";
+              btn.disabled = false;
+              isLaunching = false;
+            }, 3000);
+          } else {
+            alert("Browser launch failed: " + result.message);
+            resetButton(btn, "🌐 Open in Browser");
+          }
+        } catch (error) {
+          alert("Browser launch error: " + error.message);
+          resetButton(btn, "🌐 Open in Browser");
+        }
+      }
+
+      async function handleEmbedLaunch() {
+        console.log("�� Embed launch clicked");
+        alert("🚀 Embed mode coming soon!");
+      }
+
+      function resetButton(btn, originalText) {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        isLaunching = false;
+      }
+
+      function showInfo() {
+        alert(
+          "📋 License: DEMO-1234-****\nStatus: Active\nPlatform: " +
+            navigator.platform
+        );
+      }
+
+      function showSettings() {
+        alert("⚙️ Settings coming soon!");
+      }
+
+      async function resetLicense() {
+        if (confirm("Reset license?")) {
+          try {
+            await window.electronAPI.resetActivation();
+          } catch (error) {
+            console.error("Reset error:", error);
+          }
+        }
+      }
+
+      async function exitApp() {
+        if (confirm("Exit application?")) {
+          try {
+            await window.electronAPI.closeApp();
+          } catch (error) {
+            window.close();
+          }
+        }
+      }
+
+      console.log("📊 Dashboard script loaded");
+    </script>
+  </body>
+</html>

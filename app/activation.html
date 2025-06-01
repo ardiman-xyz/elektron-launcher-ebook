@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>E-book Activation</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        margin: 0;
+        padding: 50px;
+        color: white;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .container {
+        background: rgba(255, 255, 255, 0.95);
+        color: #333;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+      }
+      .logo {
+        font-size: 64px;
+        margin-bottom: 20px;
+      }
+      h1 {
+        margin-bottom: 10px;
+        color: #2c3e50;
+      }
+      p {
+        color: #6c757d;
+        margin-bottom: 30px;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        text-align: left;
+      }
+      input {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        font-size: 16px;
+        font-family: monospace;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+      button {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      button:hover {
+        transform: translateY(-2px);
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .help {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        text-align: left;
+      }
+      .message {
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: none;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+      }
+      .spinner {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top: 2px solid white;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+        margin-right: 8px;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="logo">📚</div>
+      <h1>E-book Activation</h1>
+      <p>Enter your license key to access your e-book</p>
+
+      <div id="message" class="message"></div>
+
+      <div class="help">
+        <strong>💡 For testing, use:</strong><br />
+        <code>DEMO-1234-5678-9ABC</code> or <code>TEST-ABCD-EFGH-IJKL</code>
+      </div>
+
+      <form id="activationForm">
+        <div class="form-group">
+          <label for="licenseKey">License Key</label>
+          <input
+            type="text"
+            id="licenseKey"
+            placeholder="XXXX-XXXX-XXXX-XXXX"
+            maxlength="19"
+            required
+          />
+        </div>
+        <button type="submit" id="activateBtn">🚀 Activate Now</button>
+      </form>
+    </div>
+
+    <script>
+      console.log("📚 Activation page script loaded");
+
+      // Check if Electron API is available
+      if (window.electronAPI) {
+        console.log("✅ Electron API is available");
+      } else {
+        console.error("❌ Electron API not available");
+      }
+
+      const form = document.getElementById("activationForm");
+      const input = document.getElementById("licenseKey");
+      const button = document.getElementById("activateBtn");
+      const message = document.getElementById("message");
+
+      // Auto-format license key
+      input.addEventListener("input", (e) => {
+        let value = e.target.value.replace(/[^A-Z0-9]/g, "").toUpperCase();
+        let formatted = value.match(/.{1,4}/g)?.join("-") || value;
+        if (formatted.length > 19) formatted = formatted.substring(0, 19);
+        e.target.value = formatted;
+      });
+
+      // Handle form submission
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const licenseKey = input.value.trim();
+
+        if (licenseKey.length < 19) {
+          showMessage("Please enter a complete license key", "error");
+          return;
+        }
+
+        // Show loading
+        button.disabled = true;
+        button.innerHTML = '<div class="spinner"></div>Activating...';
+
+        try {
+          console.log("🔑 Attempting activation with:", licenseKey);
+
+          if (!window.electronAPI) {
+            throw new Error("Electron API not available");
+          }
+
+          const result = await window.electronAPI.activateLicense(licenseKey);
+          console.log("�� Activation result:", result);
+
+          if (result.success) {
+            showMessage(
+              "✅ Activation successful! " + result.message,
+              "success"
+            );
+          } else {
+            showMessage("❌ " + result.message, "error");
+          }
+        } catch (error) {
+          console.error("❌ Activation error:", error);
+          showMessage("Activation error: " + error.message, "error");
+        } finally {
+          button.disabled = false;
+          button.innerHTML = "🚀 Activate Now";
+        }
+      });
+
+      function showMessage(text, type) {
+        message.textContent = text;
+        message.className = "message " + type;
+        message.style.display = "block";
+      }
+
+      // Focus input
+      input.focus();
+
+      console.log("🎯 Activation page ready");
+    </script>
+  </body>
+</html>
