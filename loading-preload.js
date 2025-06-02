@@ -17,3 +17,5 @@ contextBridge.exposeInMainWorld("electronAPI", {
   getActivationPath: () => ipcRenderer.invoke("get-activation-path"),
   platform: process.platform,
 });
+
+console.log("✅ Preload script completed");

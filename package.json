@@ -1,41 +1,46 @@
 {
   "name": "ebook-launcher",
   "version": "1.0.0",
-  "description": "Protected E-book Launcher with License Activation",
+  "description": "Protected E-book Launcher with Encryption",
   "main": "main.js",
   "homepage": "./",
   "scripts": {
     "start": "electron .",
     "dev": "nodemon --exec electron .",
-    "build": "electron-builder",
-    "build-win": "electron-builder --win",
-    "build-mac": "electron-builder --mac",
-    "build-linux": "electron-builder --linux",
+    "encrypt-flipbook": "node scripts/encrypt-flipbook.js encrypt",
+    "test-encryption": "node scripts/encrypt-flipbook.js test",
+    "build": "npm run encrypt-flipbook && electron-builder",
+    "build-encrypted": "npm run encrypt-flipbook && electron-builder",
+    "build-win": "npm run encrypt-flipbook && electron-builder --win",
+    "build-mac": "npm run encrypt-flipbook && electron-builder --mac",
+    "build-linux": "npm run encrypt-flipbook && electron-builder --linux",
     "pack": "electron-builder --dir",
     "dist": "electron-builder --publish=never",
     "test": "echo \"No tests specified\""
   },
   "build": {
-    "appId": "com.ebook.launcher",
-    "productName": "E-book Launcher",
+    "appId": "com.ebook.launcher.secure",
+    "productName": "E-book Launcher Secure",
     "directories": {
       "output": "dist",
       "buildResources": "build"
     },
     "files": [
       "**/*",
-      "!node_modules/**/*",
+      "!assets/flipbook/**/*",
+      "!node_modules/.cache/**/*",
       "node_modules/crypto-js/**/*",
       "node_modules/uuid/**/*",
-      "node_modules/fs-extra/**/*",
-      "node_modules/path-exists/**/*",
       "node_modules/node-machine-id/**/*",
       "node_modules/systeminformation/**/*"
     ],
     "extraResources": [
       {
-        "from": "assets/flipbook",
-        "to": "flipbook"
+        "from": "assets/flipbook-encrypted",
+        "to": "flipbook-encrypted",
+        "filter": [
+          "**/*"
+        ]
       }
     ],
     "win": {
@@ -83,7 +88,8 @@
     "ebook",
     "launcher",
     "electron",
-    "protected"
+    "protected",
+    "encrypted"
   ],
   "author": "Ardiman",
   "license": "MIT",
@@ -96,8 +102,6 @@
   "dependencies": {
     "crypto-js": "^4.2.0",
     "uuid": "^9.0.1",
-    "fs-extra": "^11.1.1",
-    "path-exists": "^5.0.0",
     "node-machine-id": "^1.1.12",
     "systeminformation": "^5.21.8"
   }

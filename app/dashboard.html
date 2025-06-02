@@ -5,95 +5,137 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>E-book Dashboard</title>
     <style>
+      /* Inline styles untuk no-scroll */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
       body {
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden; /* No scroll */
         font-family: Arial, sans-serif;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        margin: 0;
-        padding: 20px;
         color: white;
-        min-height: 100vh;
+        user-select: none;
+      }
+
+      .container {
+        width: 100vw;
+        height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 20px;
+        overflow: hidden;
       }
-      .container {
+
+      .card {
         background: rgba(255, 255, 255, 0.95);
         color: #333;
-        padding: 30px;
         border-radius: 20px;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-        max-width: 500px;
         width: 100%;
+        max-width: 500px;
+        max-height: calc(100vh - 40px);
+        padding: 25px;
         text-align: center;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+
+        /* Custom scrollbar */
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
       }
+
+      .card::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .card::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+      }
+
       .logo {
-        font-size: 48px;
-        margin-bottom: 15px;
+        font-size: 40px;
+        margin-bottom: 10px;
       }
+
       h1 {
-        margin-bottom: 20px;
+        margin-bottom: 15px;
         color: #2c3e50;
-        font-size: 24px;
+        font-size: 22px;
       }
+
       .status {
-        background: #28a745;
-        color: white;
-        padding: 6px 12px;
+        background: #dad7cd;
+        color: #344e41;
+        padding: 5px 10px;
         border-radius: 15px;
         font-size: 12px;
-        margin-bottom: 25px;
+        margin-bottom: 20px;
         display: inline-block;
       }
+
       .launch-btn {
         width: 100%;
-        padding: 12px;
-        margin: 8px 0;
+        padding: 20px;
+        margin: 5px 0;
         border: none;
         border-radius: 10px;
-        font-size: 14px;
+        font-size: 15px;
         font-weight: bold;
         cursor: pointer;
         transition: transform 0.2s;
       }
+
       .launch-btn:hover {
         transform: translateY(-2px);
       }
+
       .launch-btn:disabled {
         opacity: 0.6;
         cursor: not-allowed;
       }
+
       .internal {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
       }
+
       .browser {
         background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         color: white;
       }
-      .embed {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        color: white;
-      }
+
       .menu-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        margin-top: 20px;
+        gap: 8px;
+        margin-top: 15px;
       }
+
       .menu-btn {
-        padding: 10px;
+        padding: 8px;
         border: none;
         border-radius: 8px;
         cursor: pointer;
-        font-size: 12px;
+        font-size: 10px;
         background: #f8f9fa;
         color: #495057;
         transition: all 0.2s;
       }
+
       .menu-btn:hover {
         background: #e9ecef;
         transform: translateY(-1px);
       }
+
       .spinner {
         border: 2px solid rgba(255, 255, 255, 0.3);
         border-top: 2px solid white;
@@ -104,6 +146,7 @@
         display: inline-block;
         margin-right: 6px;
       }
+
       @keyframes spin {
         0% {
           transform: rotate(0deg);
@@ -112,37 +155,90 @@
           transform: rotate(360deg);
         }
       }
+
+      /* Responsive untuk layar kecil */
+      @media (max-height: 600px) {
+        .container {
+          padding: 15px;
+        }
+        .card {
+          padding: 20px;
+          max-height: calc(100vh - 30px);
+        }
+        .logo {
+          font-size: 35px;
+          margin-bottom: 8px;
+        }
+        h1 {
+          font-size: 20px;
+          margin-bottom: 10px;
+        }
+        .status {
+          padding: 4px 8px;
+          font-size: 10px;
+          margin-bottom: 15px;
+        }
+        .launch-btn {
+          padding: 8px;
+          margin: 4px 0;
+          font-size: 12px;
+        }
+        .menu-btn {
+          padding: 6px;
+          font-size: 9px;
+        }
+        .menu-grid {
+          gap: 6px;
+          margin-top: 12px;
+        }
+      }
+
+      @media (max-height: 500px) {
+        .logo {
+          display: none;
+        }
+        h1 {
+          font-size: 18px;
+        }
+        .card {
+          padding: 15px;
+        }
+        .launch-btn {
+          padding: 6px;
+          font-size: 11px;
+        }
+        .menu-btn {
+          padding: 4px;
+          font-size: 8px;
+        }
+      }
     </style>
   </head>
   <body>
     <div class="container">
-      <div class="logo">📚</div>
-      <h1>E-book Dashboard</h1>
-      <div class="status">✅ Licensed & Active</div>
+      <div class="card">
+        <div class="logo">📚</div>
+        <h1>E-book Dashboard</h1>
+        <div class="status" id="licenseStatus">Loading...</div>
 
-      <button
-        class="launch-btn internal"
-        onclick="launchInternal()"
-        id="btn-internal"
-      >
-        📖 Open Internal Window
-      </button>
-
-      <button
-        class="launch-btn browser"
-        onclick="launchBrowser()"
-        id="btn-browser"
-      >
-        🌐 Open in Browser
-      </button>
-
-      <div class="menu-grid">
-        <button class="menu-btn" onclick="showInfo()">ℹ️ License Info</button>
-        <button class="menu-btn" onclick="showSettings()">⚙️ Settings</button>
-        <button class="menu-btn" onclick="resetLicense()">
-          🔄 Reset License
+        <button
+          class="launch-btn internal"
+          onclick="launchInternal()"
+          id="btn-internal"
+        >
+          📖 Open Internal Window
         </button>
-        <button class="menu-btn" onclick="exitApp()">❌ Exit App</button>
+
+        <div class="menu-grid">
+          <button class="menu-btn" onclick="showInfo()">ℹ️ License Info</button>
+          <button class="menu-btn info" onclick="showBookInfo()">
+            📖 Book Info
+          </button>
+          <button class="menu-btn" onclick="resetLicense()">
+            🔄 Reset License
+          </button>
+          <button class="menu-btn" onclick="exitApp()">❌ Exit App</button>
+        </div>
       </div>
     </div>
 
@@ -154,6 +250,7 @@
       document.addEventListener("DOMContentLoaded", () => {
         console.log("📄 DOM loaded");
         initializeDashboard();
+        loadDashboardStatus();
       });
 
       function initializeDashboard() {
@@ -166,37 +263,80 @@
         }
 
         console.log("✅ Electron API available");
-        setupEventListeners();
+
+        // Prevent scrolling dengan keyboard
+        document.addEventListener("keydown", function (e) {
+          if (
+            [
+              "ArrowUp",
+              "ArrowDown",
+              "PageUp",
+              "PageDown",
+              "Home",
+              "End",
+              "Space",
+            ].includes(e.code)
+          ) {
+            if (e.target === document.body) {
+              e.preventDefault();
+            }
+          }
+        });
+
+        // Prevent scrolling dengan mouse wheel
+        document.addEventListener(
+          "wheel",
+          function (e) {
+            if (
+              e.target === document.body ||
+              e.target === document.documentElement
+            ) {
+              e.preventDefault();
+            }
+          },
+          { passive: false }
+        );
       }
 
-      function setupEventListeners() {
-        console.log("🎯 Setting up event listeners...");
+      async function loadDashboardStatus() {
+        try {
+          console.log("🔄 Loading dashboard license status...");
 
-        // Launch buttons
-        document
-          .getElementById("btn-internal")
-          .addEventListener("click", handleInternalLaunch);
-        document
-          .getElementById("btn-browser")
-          .addEventListener("click", handleBrowserLaunch);
-        document
-          .getElementById("btn-embed")
-          .addEventListener("click", handleEmbedLaunch);
+          if (window.electronAPI) {
+            const activationData = await window.electronAPI.getActivationInfo();
 
-        // Menu buttons
-        document.getElementById("btn-info").addEventListener("click", showInfo);
-        document
-          .getElementById("btn-settings")
-          .addEventListener("click", showSettings);
-        document
-          .getElementById("btn-reset")
-          .addEventListener("click", resetLicense);
-        document.getElementById("btn-exit").addEventListener("click", exitApp);
-
-        console.log("✅ All event listeners set up");
+            if (activationData) {
+              // License is active
+              document.getElementById("licenseStatus").textContent =
+                "✅ Licensed & Active";
+              document.getElementById("licenseStatus").style.background =
+                "#d4edda";
+              document.getElementById("licenseStatus").style.color = "#155724";
+            } else {
+              // No license found
+              document.getElementById("licenseStatus").textContent =
+                "⚠️ Demo Mode";
+              document.getElementById("licenseStatus").style.background =
+                "#fff3cd";
+              document.getElementById("licenseStatus").style.color = "#856404";
+            }
+          } else {
+            // Electron API not available
+            document.getElementById("licenseStatus").textContent =
+              "ℹ️ Browser Mode";
+            document.getElementById("licenseStatus").style.background =
+              "#d1ecf1";
+            document.getElementById("licenseStatus").style.color = "#0c5460";
+          }
+        } catch (error) {
+          console.error("❌ Error loading dashboard status:", error);
+          document.getElementById("licenseStatus").textContent = "❌ Error";
+          document.getElementById("licenseStatus").style.background = "#f8d7da";
+          document.getElementById("licenseStatus").style.color = "#721c24";
+        }
       }
 
-      async function handleInternalLaunch() {
+      async function launchInternal() {
         console.log("🏠 Internal launch button clicked!");
 
         if (isLaunching) return;
@@ -232,70 +372,100 @@
         }
       }
 
-      async function handleBrowserLaunch() {
-        console.log("🌐 Browser launch button clicked!");
-
-        if (isLaunching) return;
-
-        const btn = document.getElementById("btn-browser");
-
-        try {
-          isLaunching = true;
-          btn.disabled = true;
-          btn.innerHTML = '<div class="spinner"></div>Opening...';
-
-          const result = await window.electronAPI.launchEbookBrowser();
-
-          if (result.success) {
-            btn.innerHTML = "✅ Opened in Browser!";
-            btn.style.background =
-              "linear-gradient(135deg, #28a745 0%, #20c997 100%)";
-
-            setTimeout(() => {
-              btn.innerHTML = "🌐 Open in Browser";
-              btn.style.background =
-                "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)";
-              btn.disabled = false;
-              isLaunching = false;
-            }, 3000);
-          } else {
-            alert("Browser launch failed: " + result.message);
-            resetButton(btn, "🌐 Open in Browser");
-          }
-        } catch (error) {
-          alert("Browser launch error: " + error.message);
-          resetButton(btn, "🌐 Open in Browser");
-        }
-      }
-
-      async function handleEmbedLaunch() {
-        console.log("�� Embed launch clicked");
-        alert("🚀 Embed mode coming soon!");
-      }
-
       function resetButton(btn, originalText) {
         btn.innerHTML = originalText;
         btn.disabled = false;
         isLaunching = false;
       }
 
-      function showInfo() {
-        alert(
-          "📋 License: DEMO-1234-****\nStatus: Active\nPlatform: " +
-            navigator.platform
-        );
-      }
+      async function showInfo() {
+        console.log("📋 Loading dynamic license information for popup...");
 
-      function showSettings() {
-        alert("⚙️ Settings coming soon!");
+        try {
+          if (window.electronAPI) {
+            const activationData = await window.electronAPI.getActivationInfo();
+
+            if (activationData) {
+              // Get real activation data
+              const fullLicenseKey =
+                activationData.licenseKey || "DEMO-1234-5678-9ABC";
+              const maskedKey = fullLicenseKey.substring(0, 9) + "****";
+
+              // Get system info for platform details
+              let platformDisplay =
+                activationData.platform || navigator.platform;
+              let archInfo = "";
+
+              try {
+                const systemInfo = await window.electronAPI.getSystemInfo();
+                if (systemInfo.success) {
+                  archInfo = systemInfo.data.arch || "";
+                }
+              } catch (e) {
+                console.warn("Could not get system info:", e);
+              }
+
+              // Format platform display like in the image
+              switch (activationData.platform) {
+                case "win32":
+                  platformDisplay =
+                    archInfo === "x64" ? "Windows x86_64" : "Windows";
+                  break;
+                case "darwin":
+                  platformDisplay =
+                    archInfo === "arm64"
+                      ? "macOS arm64"
+                      : archInfo === "x64"
+                      ? "macOS x86_64"
+                      : "macOS";
+                  break;
+                case "linux":
+                  platformDisplay =
+                    archInfo === "x64"
+                      ? "Linux x86_64"
+                      : archInfo === "arm64"
+                      ? "Linux arm64"
+                      : "Linux";
+                  break;
+                default:
+                  platformDisplay = activationData.platform;
+              }
+
+              // Show dialog like in the image
+              alert(`📋 License: ${maskedKey}
+Status: Active
+Platform: ${platformDisplay}`);
+            } else {
+              // No activation data found
+              alert(`📋 License: DEMO-1234-****
+Status: Demo Mode
+Platform: ${navigator.platform}`);
+            }
+          } else {
+            // Electron API not available
+            alert(`📋 License: EVAL-0000-****
+Status: Browser Mode
+Platform: ${navigator.platform}`);
+          }
+        } catch (error) {
+          console.error("❌ Error loading license info:", error);
+          alert(`📋 Error loading license information
+${error.message}`);
+        }
       }
 
       async function resetLicense() {
-        if (confirm("Reset license?")) {
+        if (
+          confirm("Reset license? This will return you to activation page.")
+        ) {
           try {
-            await window.electronAPI.resetActivation();
+            const result = await window.electronAPI.resetActivation();
+            if (result.success) {
+              console.log("✅ License reset successfully");
+            }
           } catch (error) {
             console.error("Reset error:", error);
+            alert("Error resetting license: " + error.message);
           }
         }
       }
@@ -305,8 +475,36 @@
           try {
             await window.electronAPI.closeApp();
           } catch (error) {
+            console.error("Exit error:", error);
             window.close();
           }
+        }
+      }
+
+      function showBookInfo() {
+        console.log("📖 Opening book info page...");
+
+        try {
+          // Navigate to info page
+          window.location.href = "info.html";
+        } catch (error) {
+          console.error("Error opening info page:", error);
+
+          // Fallback: show info in alert
+          alert(`📚 E-book Information
+                  
+Title: Kepala Sekolah Sebagai Pemimpin Pembelajaran Inovatif
+Author: Hasma Nurjaya
+Year: 2025
+Pages: 347
+Size: 25.4 MB
+Format: Interactive PDF
+Category: Inovatif, Pembelajaran & Pemimpin
+Language: Bahasa Indonesia
+Publisher: Digital Learning Press
+ISBN: 978-602-1234-56-7
+
+Description: Buku komprehensif tentang kepemimpinan pembelajaran inovatif.`);
         }
       }
 

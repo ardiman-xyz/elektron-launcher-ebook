@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>E-book Information</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        user-select: none;
+      }
+
+      .container {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        overflow: hidden;
+      }
+
+      .card {
+        background: rgba(255, 255, 255, 0.95);
+        color: #333;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        max-width: 700px;
+        max-height: calc(100vh - 40px);
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+        position: relative;
+      }
+
+      .card::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .card::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 25px;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 20px;
+      }
+
+      .back-btn {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background: rgba(0, 0, 0, 0.1);
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        color: #333;
+      }
+
+      .back-btn:hover {
+        background: rgba(0, 0, 0, 0.2);
+        transform: translateY(-2px);
+      }
+
+      .logo {
+        font-size: 48px;
+        margin-bottom: 10px;
+      }
+
+      .title {
+        color: #2c3e50;
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 5px;
+      }
+
+      .subtitle {
+        color: #6c757d;
+        font-size: 14px;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 25px;
+      }
+
+      .info-card {
+        background: rgba(248, 249, 250, 0.8);
+        padding: 20px;
+        border-radius: 12px;
+        border-left: 4px solid #667eea;
+        transition: all 0.3s ease;
+      }
+
+      .info-card:hover {
+        background: rgba(248, 249, 250, 1);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .info-card h3 {
+        color: #2c3e50;
+        font-size: 16px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .info-card p {
+        color: #495057;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .info-card .value {
+        color: #2c3e50;
+        font-weight: 600;
+      }
+
+      .book-cover {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        grid-column: 1 / -1;
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        color: white;
+        margin-bottom: 20px;
+      }
+
+      .book-cover .cover-icon {
+        font-size: 80px;
+        margin-bottom: 15px;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+      }
+
+      .book-cover .book-title {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 8px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .book-cover .book-author {
+        font-size: 18px;
+        opacity: 0.9;
+        margin-bottom: 5px;
+      }
+
+      .book-cover .book-year {
+        font-size: 14px;
+        opacity: 0.8;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 25px;
+      }
+
+      .stat-item {
+        background: rgba(40, 167, 69, 0.1);
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        border: 2px solid rgba(40, 167, 69, 0.2);
+      }
+
+      .stat-item .stat-value {
+        font-size: 24px;
+        font-weight: bold;
+        color: #28a745;
+        margin-bottom: 5px;
+      }
+
+      .stat-item .stat-label {
+        font-size: 12px;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .description {
+        background: rgba(248, 249, 250, 0.8);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+      }
+
+      .description h3 {
+        color: #2c3e50;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .description p {
+        color: #495057;
+        line-height: 1.6;
+        font-size: 14px;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .btn {
+        flex: 1;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .btn-secondary {
+        background: #f8f9fa;
+        color: #495057;
+        border: 2px solid #dee2e6;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+      }
+
+      .license-info {
+        background: linear-gradient(
+          135deg,
+          rgba(40, 167, 69, 0.1) 0%,
+          rgba(32, 201, 151, 0.1) 100%
+        );
+        border: 2px solid rgba(40, 167, 69, 0.2);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+      }
+
+      .license-info h3 {
+        color: #28a745;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .license-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        font-size: 13px;
+      }
+
+      .license-details div {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .license-details .label {
+        color: #6c757d;
+      }
+
+      .license-details .value {
+        color: #2c3e50;
+        font-weight: 600;
+      }
+
+      /* Status styling untuk license */
+      .license-status-active {
+        color: #28a745 !important;
+      }
+
+      .license-status-inactive {
+        color: #dc3545 !important;
+      }
+
+      .license-status-demo {
+        color: #ffc107 !important;
+      }
+
+      .license-status-eval {
+        color: #17a2b8 !important;
+      }
+
+      .license-status-error {
+        color: #dc3545 !important;
+      }
+
+      /* Purchase Information Styling */
+      .purchase-info {
+        background: linear-gradient(
+          135deg,
+          rgba(102, 126, 234, 0.1) 0%,
+          rgba(118, 75, 162, 0.1) 100%
+        );
+        border: 2px solid rgba(102, 126, 234, 0.2);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+      }
+
+      .purchase-info h3 {
+        color: #667eea;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+      }
+
+      .purchase-content {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .price-section {
+        text-align: center;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 15px;
+        border-radius: 10px;
+        border: 2px solid rgba(102, 126, 234, 0.2);
+      }
+
+      .price {
+        font-size: 28px;
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 5px;
+      }
+
+      .currency {
+        font-size: 20px;
+        margin-right: 5px;
+      }
+
+      .amount {
+        font-size: 32px;
+      }
+
+      .price-note {
+        color: #6c757d;
+        font-size: 12px;
+        font-style: italic;
+      }
+
+      .contact-section {
+        background: rgba(255, 255, 255, 0.6);
+        padding: 15px;
+        border-radius: 10px;
+      }
+
+      .contact-label {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 15px;
+        font-size: 14px;
+      }
+
+      .contact-methods {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 15px;
+      }
+
+      .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px;
+        background: rgba(248, 249, 250, 0.8);
+        border-radius: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+      }
+
+      .contact-icon {
+        font-size: 20px;
+        min-width: 25px;
+        text-align: center;
+      }
+
+      .contact-info {
+        flex: 1;
+      }
+
+      .contact-type {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 12px;
+        margin-bottom: 2px;
+      }
+
+      .contact-value {
+        color: #495057;
+        font-size: 11px;
+        font-family: monospace;
+      }
+
+      .contact-btn {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 6px;
+        font-size: 10px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 70px;
+      }
+
+      .contact-btn.whatsapp {
+        background: #25d366;
+        color: white;
+      }
+
+      .contact-btn.whatsapp:hover {
+        background: #128c7e;
+        transform: translateY(-1px);
+      }
+
+      .contact-btn.email {
+        background: #dc3545;
+        color: white;
+      }
+
+      .contact-btn.email:hover {
+        background: #c82333;
+        transform: translateY(-1px);
+      }
+
+      .contact-btn.website {
+        background: #007bff;
+        color: white;
+      }
+
+      .contact-btn.website:hover {
+        background: #0056b3;
+        transform: translateY(-1px);
+      }
+
+      .purchase-note {
+        background: rgba(40, 167, 69, 0.1);
+        border: 1px solid rgba(40, 167, 69, 0.2);
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 11px;
+      }
+
+      .purchase-note p {
+        color: #155724;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .purchase-note ul {
+        margin: 0;
+        padding-left: 15px;
+        color: #155724;
+      }
+
+      .purchase-note li {
+        margin-bottom: 3px;
+        line-height: 1.4;
+      }
+
+      @media (max-width: 768px) {
+        .info-grid,
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .license-details {
+          grid-template-columns: 1fr;
+        }
+
+        .action-buttons {
+          flex-direction: column;
+        }
+
+        .container {
+          padding: 15px;
+        }
+
+        .card {
+          padding: 20px;
+        }
+
+        .purchase-content {
+          gap: 15px;
+        }
+
+        .contact-item {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+          text-align: center;
+        }
+
+        .contact-info {
+          width: 100%;
+        }
+
+        .contact-btn {
+          width: 100%;
+          min-width: auto;
+        }
+
+        .price {
+          font-size: 24px;
+        }
+
+        .amount {
+          font-size: 28px;
+        }
+      }
+
+      @media (max-height: 600px) {
+        .book-cover .cover-icon {
+          font-size: 60px;
+        }
+
+        .book-cover .book-title {
+          font-size: 22px;
+        }
+
+        .card {
+          padding: 20px;
+        }
+
+        .purchase-info {
+          padding: 15px;
+        }
+
+        .price-section {
+          padding: 10px;
+        }
+
+        .contact-section {
+          padding: 10px;
+        }
+
+        .price {
+          font-size: 20px;
+        }
+
+        .amount {
+          font-size: 24px;
+        }
+
+        .contact-methods {
+          gap: 8px;
+        }
+
+        .contact-item {
+          padding: 8px;
+        }
+
+        .purchase-note {
+          padding: 8px;
+        }
+
+        .purchase-note ul {
+          padding-left: 12px;
+        }
+      }
+
+      /* Spinner animation */
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <button class="back-btn" onclick="goBack()" title="Back to Dashboard">
+          ←
+        </button>
+
+        <div class="header">
+          <div class="logo">📖</div>
+          <h1 class="title">E-book Information</h1>
+          <p class="subtitle">Detailed information about your digital book</p>
+        </div>
+
+        <div class="book-cover">
+          <div class="cover-icon">📚</div>
+          <div class="book-title">
+            Kepala Sekolah Sebagai Pemimpin Pembelajaran Inovatif
+          </div>
+          <div class="book-author">by Hasma Nurjaya</div>
+          <div class="book-year">Published 2024</div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-value">347</div>
+            <div class="stat-label">Pages</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">25.4</div>
+            <div class="stat-label">MB Size</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">PDF</div>
+            <div class="stat-label">Format</div>
+          </div>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-card">
+            <h3>📝 Title</h3>
+            <p class="value">
+              Kepala Sekolah Sebagai Pemimpin Pembelajaran Inovatif
+            </p>
+          </div>
+
+          <div class="info-card">
+            <h3>👤 Author</h3>
+            <p class="value">Hasma Nurjaya</p>
+          </div>
+
+          <div class="info-card">
+            <h3>📅 Publication Year</h3>
+            <p class="value">2025</p>
+          </div>
+
+          <div class="info-card">
+            <h3>🏷️ Category</h3>
+            <p class="value">Inovatif, Pembelajaran & Pemimpin</p>
+          </div>
+
+          <div class="info-card">
+            <h3>🌐 Language</h3>
+            <p class="value">Bahasa Indonesia</p>
+          </div>
+
+          <div class="info-card">
+            <h3>📊 Version</h3>
+            <p class="value">1.0.0</p>
+          </div>
+
+          <div class="info-card">
+            <h3>📍 Publisher</h3>
+            <p class="value">Digital Learning Press</p>
+          </div>
+
+          <div class="info-card">
+            <h3>🔢 ISBN</h3>
+            <p class="value">978-602-1234-56-7</p>
+          </div>
+        </div>
+
+        <div class="purchase-info">
+          <h3>🛒 Purchase Information</h3>
+          <div class="purchase-content">
+            <div class="price-section">
+              <div class="price">
+                <span class="currency">Rp</span>
+                <span class="amount">150.000</span>
+              </div>
+              <div class="price-note">Digital E-book License</div>
+            </div>
+
+            <div class="contact-section">
+              <p class="contact-label">
+                Untuk pembelian buku ini, silakan hubungi:
+              </p>
+
+              <div class="contact-methods">
+                <div class="contact-item">
+                  <span class="contact-icon">📱</span>
+                  <div class="contact-info">
+                    <div class="contact-type">WhatsApp</div>
+                    <div class="contact-value">+62 812-3456-7890</div>
+                  </div>
+                  <!-- <button class="contact-btn whatsapp" onclick="openWhatsApp()">
+                    Chat Now
+                  </button> -->
+                </div>
+
+                <div class="contact-item">
+                  <span class="contact-icon">📧</span>
+                  <div class="contact-info">
+                    <div class="contact-type">Email</div>
+                    <div class="contact-value">sales@digitallearning.id</div>
+                  </div>
+                  <!-- <button class="contact-btn email" onclick="openEmail()">
+                    Send Email
+                  </button> -->
+                </div>
+
+                <div class="contact-item">
+                  <span class="contact-icon">🌐</span>
+                  <div class="contact-info">
+                    <div class="contact-type">Website</div>
+                    <div class="contact-value">www.digitallearning.id</div>
+                  </div>
+                  <!-- <button class="contact-btn website" onclick="openWebsite()">
+                    Visit Site
+                  </button> -->
+                </div>
+              </div>
+
+              <div class="purchase-note">
+                <p><strong>📋 Yang Anda Dapatkan:</strong></p>
+                <ul>
+                  <li>✅ E-book digital format PDF interaktif</li>
+                  <li>✅ License permanent (tidak expired)</li>
+                  <li>✅ Akses di semua device</li>
+                  <li>✅ Update gratis jika ada revisi</li>
+                  <li>✅ Customer support</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="license-info">
+          <h3>🔐 License Information</h3>
+          <div class="license-details">
+            <div>
+              <span class="label">License Key:</span>
+              <span class="value" id="licenseKey">Loading...</span>
+            </div>
+            <div>
+              <span class="label">Status:</span>
+              <span class="value" id="licenseStatus">Loading...</span>
+            </div>
+            <div>
+              <span class="label">Activated:</span>
+              <span class="value" id="activationDate">Loading...</span>
+            </div>
+            <div>
+              <span class="label">Device:</span>
+              <span class="value" id="deviceInfo">Loading...</span>
+            </div>
+            <div>
+              <span class="label">Platform:</span>
+              <span class="value" id="platformInfo">Loading...</span>
+            </div>
+            <div>
+              <span class="label">Type:</span>
+              <span class="value" id="licenseType">Loading...</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn btn-primary" onclick="openEbook()">
+            📖 Open E-book
+          </button>
+          <button class="btn btn-secondary" onclick="goBack()">
+            ← Back to Dashboard
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let isLaunching = false;
+
+      document.addEventListener("DOMContentLoaded", () => {
+        loadLicenseInfo();
+
+        // Prevent scrolling
+        document.addEventListener("keydown", function (e) {
+          if (
+            [
+              "ArrowUp",
+              "ArrowDown",
+              "PageUp",
+              "PageDown",
+              "Home",
+              "End",
+              "Space",
+            ].includes(e.code)
+          ) {
+            if (e.target === document.body) {
+              e.preventDefault();
+            }
+          }
+        });
+
+        document.addEventListener(
+          "wheel",
+          function (e) {
+            if (
+              e.target === document.body ||
+              e.target === document.documentElement
+            ) {
+              e.preventDefault();
+            }
+          },
+          { passive: false }
+        );
+      });
+
+      async function loadLicenseInfo() {
+        try {
+          if (window.electronAPI) {
+            // Get activation data
+            const activationData = await window.electronAPI.getActivationInfo();
+
+            if (activationData) {
+              // Update License Key dengan format yang benar
+              const fullLicenseKey =
+                activationData.licenseKey || "DEMO-1234-5678-9ABC";
+              const maskedLicenseKey = fullLicenseKey.substring(0, 9) + "****";
+              document.getElementById("licenseKey").textContent =
+                maskedLicenseKey;
+
+              // Update Status
+              const currentTime = new Date();
+              const activatedTime = new Date(activationData.activatedAt);
+              const isValid = activatedTime <= currentTime;
+
+              if (isValid) {
+                document.getElementById("licenseStatus").innerHTML =
+                  '<span style="color: #28a745;">✅ Active</span>';
+              } else {
+                document.getElementById("licenseStatus").innerHTML =
+                  '<span style="color: #dc3545;">❌ Inactive</span>';
+              }
+
+              // Update Activation Date dengan format Indonesia
+              const activatedDate = new Date(
+                activationData.activatedAt
+              ).toLocaleDateString("id-ID", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+              });
+              document.getElementById("activationDate").textContent =
+                activatedDate;
+
+              // Update Device Info dengan format yang lebih user-friendly
+              const deviceFingerprint =
+                activationData.deviceFingerprint || "unknown";
+              const shortDevice = deviceFingerprint
+                .substring(0, 12)
+                .toLowerCase();
+              document.getElementById("deviceInfo").textContent =
+                shortDevice + "...";
+
+              // Update Platform dengan detail lebih lengkap
+              const platformInfo =
+                activationData.platform || navigator.platform;
+              let platformDisplay = platformInfo;
+
+              switch (platformInfo) {
+                case "win32":
+                  platformDisplay = "Windows";
+                  break;
+                case "darwin":
+                  platformDisplay = "macOS";
+                  break;
+                case "linux":
+                  platformDisplay = "Linux";
+                  break;
+                default:
+                  platformDisplay =
+                    platformInfo.charAt(0).toUpperCase() +
+                    platformInfo.slice(1);
+              }
+
+              document.getElementById("platformInfo").textContent =
+                platformDisplay;
+
+              // Set license type (permanent, no expiry)
+              document.getElementById("licenseType").innerHTML =
+                '<span style="color: #28a745;">Permanent</span>';
+            } else {
+              setDemoLicenseInfo();
+            }
+          } else {
+            console.warn(
+              "⚠️ Electron API not available, using fallback values"
+            );
+            setFallbackLicenseInfo();
+          }
+        } catch (error) {
+          console.error("❌ Error loading license info:", error);
+          setErrorLicenseInfo();
+        }
+      }
+
+      // Function untuk set demo license info
+      function setDemoLicenseInfo() {
+        document.getElementById("licenseKey").textContent = "DEMO-1234-****";
+        document.getElementById("licenseStatus").innerHTML =
+          '<span style="color: #ffc107;">⚠️ Demo</span>';
+        document.getElementById("activationDate").textContent =
+          new Date().toLocaleDateString("id-ID");
+        document.getElementById("deviceInfo").textContent = "demo-device...";
+        document.getElementById("platformInfo").textContent = getPlatformName();
+        document.getElementById("licenseType").innerHTML =
+          '<span style="color: #6c757d;">Demo Version</span>';
+      }
+
+      // Function untuk set fallback license info
+      function setFallbackLicenseInfo() {
+        document.getElementById("licenseKey").textContent = "EVAL-0000-****";
+        document.getElementById("licenseStatus").innerHTML =
+          '<span style="color: #17a2b8;">ℹ️ Evaluation</span>';
+        document.getElementById("activationDate").textContent =
+          new Date().toLocaleDateString("id-ID");
+        document.getElementById("deviceInfo").textContent = "evaluation...";
+        document.getElementById("platformInfo").textContent = getPlatformName();
+        document.getElementById("licenseType").innerHTML =
+          '<span style="color: #6c757d;">Evaluation</span>';
+      }
+
+      // Function untuk set error license info
+      function setErrorLicenseInfo() {
+        document.getElementById("licenseKey").textContent = "Error loading";
+        document.getElementById("licenseStatus").innerHTML =
+          '<span style="color: #dc3545;">❌ Error</span>';
+        document.getElementById("activationDate").textContent = "Error loading";
+        document.getElementById("deviceInfo").textContent = "Error loading";
+        document.getElementById("platformInfo").textContent = "Error loading";
+        document.getElementById("licenseType").innerHTML =
+          '<span style="color: #dc3545;">Error</span>';
+      }
+
+      // Helper function untuk get platform name
+      function getPlatformName() {
+        const platform = navigator.platform.toLowerCase();
+
+        if (platform.includes("win")) return "Windows";
+        if (platform.includes("mac")) return "macOS";
+        if (platform.includes("linux")) return "Linux";
+        if (platform.includes("android")) return "Android";
+        if (platform.includes("iphone") || platform.includes("ipad"))
+          return "iOS";
+
+        return navigator.platform;
+      }
+
+      // Contact functions
+      function openWhatsApp() {
+        const phoneNumber = "6281234567890"; // Format internasional tanpa +
+        const message =
+          encodeURIComponent(`Halo, saya tertarik untuk membeli e-book "Kepala Sekolah Sebagai Pemimpin Pembelajaran Inovatif" oleh Hasma Nurjaya.
+
+Mohon informasi untuk proses pembelian dan pembayaran.
+
+Terima kasih.`);
+
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+
+        try {
+          if (window.electronAPI) {
+            // Di Electron, buka di browser eksternal
+            window.electronAPI.openExternal &&
+              window.electronAPI.openExternal(whatsappUrl);
+          } else {
+            // Di browser, buka di tab baru
+            window.open(whatsappUrl, "_blank");
+          }
+        } catch (error) {
+          console.error("Error opening WhatsApp:", error);
+          // Fallback: copy to clipboard
+          copyToClipboard(
+            `WhatsApp: +62 812-3456-7890\nPesan: Saya tertarik membeli e-book Kepala Sekolah Sebagai Pemimpin Pembelajaran Inovatif`
+          );
+          alert("WhatsApp URL copied to clipboard!");
+        }
+      }
+
+      function openEmail() {
+        console.log("📧 Opening Email...");
+
+        const email = "sales@digitallearning.id";
+        const subject = encodeURIComponent(
+          "Inquiry - Pembelian E-book Kepala Sekolah"
+        );
+        const body = encodeURIComponent(`Halo Digital Learning Press,
+
+        Saya tertarik untuk membeli e-book berjudul:
+        "Kepala Sekolah Sebagai Pemimpin Pembelajaran Inovatif"
+        Penulis: Hasma Nurjaya
+        ISBN: 978-602-1234-56-7
+
+        Mohon informasi mengenai:
+        1. Harga dan cara pembayaran
+        2. Proses pengiriman license
+        3. Technical support yang tersedia
+
+        Terima kasih atas perhatiannya.
+
+        Salam,
+        [Nama Anda]`);
+
+        const emailUrl = `mailto:${email}?subject=${subject}&body=${body}`;
+
+        try {
+          if (window.electronAPI) {
+            // Di Electron, buka di aplikasi email default
+            window.electronAPI.openExternal &&
+              window.electronAPI.openExternal(emailUrl);
+          } else {
+            // Di browser
+            window.location.href = emailUrl;
+          }
+        } catch (error) {
+          console.error("Error opening email:", error);
+          // Fallback: copy email info
+          copyToClipboard(
+            `Email: ${email}\nSubject: Inquiry - Pembelian E-book Kepala Sekolah`
+          );
+          alert("Email address copied to clipboard!");
+        }
+      }
+
+      function openWebsite() {
+        console.log("🌐 Opening Website...");
+
+        const websiteUrl = "https://www.digitallearning.id";
+
+        try {
+          if (window.electronAPI) {
+            // Di Electron, buka di browser eksternal
+            window.electronAPI.openExternal &&
+              window.electronAPI.openExternal(websiteUrl);
+          } else {
+            // Di browser, buka di tab baru
+            window.open(websiteUrl, "_blank");
+          }
+        } catch (error) {
+          console.error("Error opening website:", error);
+          // Fallback: copy URL
+          copyToClipboard(websiteUrl);
+          alert("Website URL copied to clipboard!");
+        }
+      }
+
+      // Utility function untuk copy to clipboard
+      function copyToClipboard(text) {
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text);
+          } else {
+            // Fallback method
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            document.execCommand("copy");
+            textArea.remove();
+          }
+          return true;
+        } catch (error) {
+          console.error("Error copying to clipboard:", error);
+          return false;
+        }
+      }
+
+      function goBack() {
+        try {
+          window.history.back();
+        } catch (error) {
+          // Fallback: reload dashboard
+          window.location.href = "dashboard.html";
+        }
+      }
+
+      async function openEbook() {
+        console.log("📖 Open E-book button clicked!");
+
+        if (isLaunching) return;
+
+        // Get the button that was clicked
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        const originalBackground = btn.style.background;
+
+        try {
+          isLaunching = true;
+          btn.disabled = true;
+          btn.innerHTML =
+            '<div style="display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 6px;"></div>Opening...';
+
+          if (window.electronAPI) {
+            const result = await window.electronAPI.launchEbookInternal();
+
+            if (result.success) {
+              btn.innerHTML = "✅ E-book Opened!";
+              btn.style.background =
+                "linear-gradient(135deg, #28a745 0%, #20c997 100%)";
+
+              setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.background =
+                  originalBackground ||
+                  "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
+                btn.disabled = false;
+                isLaunching = false;
+              }, 3000);
+            } else {
+              alert("Failed to open e-book: " + result.message);
+              resetEbookButton(btn, originalText, originalBackground);
+            }
+          } else {
+            alert("E-book launcher not available");
+            resetEbookButton(btn, originalText, originalBackground);
+          }
+        } catch (error) {
+          console.error("Error opening e-book:", error);
+          alert("Error opening e-book: " + error.message);
+          resetEbookButton(btn, originalText, originalBackground);
+        }
+      }
+
+      function resetEbookButton(btn, originalText, originalBackground) {
+        btn.innerHTML = originalText;
+        btn.style.background =
+          originalBackground ||
+          "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
+        btn.disabled = false;
+        isLaunching = false;
+      }
+
+      // Dynamic year update
+      const currentYear = new Date().getFullYear();
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log("✅ E-book info page initialized");
+      });
+    </script>
+  </body>
+</html>
