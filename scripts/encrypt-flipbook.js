@@ -1,33 +1,37 @@
+// scripts/encrypt-flipbook.js - Simple Encryption
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
-class FlipbookEncryptor {
+class SimpleEncryptor {
   constructor() {
-    this.masterKey = "EBOOK-MASTER-KEY-2025-SECURE"; // Change this to your secret
-    this.algorithm = "aes-256-cbc";
+    this.secretKey = "EBOOK-SECRET-KEY-2025"; // Secret key untuk encryption
     this.inputDir = path.join(__dirname, "..", "assets", "flipbook");
     this.outputDir = path.join(__dirname, "..", "assets", "flipbook-encrypted");
   }
 
-  // Generate encryption key dari master key
-  generateKey() {
-    return crypto.scryptSync(this.masterKey, "salt-ebook-2025", 32);
+  // Simple XOR encryption (mudah untuk testing)
+  encrypt(data, key) {
+    let result = Buffer.alloc(data.length);
+    for (let i = 0; i < data.length; i++) {
+      result[i] = data[i] ^ key.charCodeAt(i % key.length);
+    }
+    return result;
+  }
+
+  // Simple XOR decryption
+  decrypt(data, key) {
+    // XOR encryption is symmetric
+    return this.encrypt(data, key);
   }
 
   // Encrypt single file
   encryptFile(inputPath, outputPath) {
     try {
+      console.log(`🔐 Encrypting: ${path.basename(inputPath)}`);
+
       const data = fs.readFileSync(inputPath);
-      const key = this.generateKey();
-      const iv = crypto.randomBytes(16);
-
-      const cipher = crypto.createCipher(this.algorithm, key);
-      let encrypted = cipher.update(data);
-      encrypted = Buffer.concat([encrypted, cipher.final()]);
-
-      // Save IV + encrypted data
-      const result = Buffer.concat([iv, encrypted]);
+      const encrypted = this.encrypt(data, this.secretKey);
 
       // Ensure output directory exists
       const outputDir = path.dirname(outputPath);
@@ -35,35 +39,20 @@ class FlipbookEncryptor {
         fs.mkdirSync(outputDir, { recursive: true });
       }
 
-      fs.writeFileSync(outputPath, result);
-      console.log(`✅ Encrypted: ${path.basename(inputPath)}`);
+      fs.writeFileSync(outputPath, encrypted);
+      console.log(`✅ Saved: ${path.basename(outputPath)}`);
     } catch (error) {
       console.error(`❌ Error encrypting ${inputPath}:`, error.message);
     }
   }
 
-  // Decrypt single file
-  decryptFile(encryptedPath, key) {
-    try {
-      const encryptedData = fs.readFileSync(encryptedPath);
-
-      // Extract IV and encrypted content
-      const iv = encryptedData.slice(0, 16);
-      const encrypted = encryptedData.slice(16);
-
-      const decipher = crypto.createDecipher(this.algorithm, key);
-      let decrypted = decipher.update(encrypted);
-      decrypted = Buffer.concat([decrypted, decipher.final()]);
-
-      return decrypted;
-    } catch (error) {
-      console.error(`❌ Error decrypting ${encryptedPath}:`, error.message);
-      return null;
-    }
-  }
-
   // Walk directory recursively
-  walkDirectory(dir, callback) {
+  walkDir(dir, callback) {
+    if (!fs.existsSync(dir)) {
+      console.error(`❌ Directory not found: ${dir}`);
+      return;
+    }
+
     const files = fs.readdirSync(dir);
 
     files.forEach((file) => {
@@ -71,35 +60,42 @@ class FlipbookEncryptor {
       const stat = fs.statSync(filePath);
 
       if (stat.isDirectory()) {
-        this.walkDirectory(filePath, callback);
+        this.walkDir(filePath, callback);
       } else {
         callback(filePath);
       }
     });
   }
 
-  // Encrypt entire flipbook directory
+  // Encrypt entire flipbook
   encryptFlipbook() {
-    console.log("🔐 Starting flipbook encryption...");
+    console.log("🚀 Starting simple flipbook encryption...");
+    console.log(`📁 Input: ${this.inputDir}`);
+    console.log(`📁 Output: ${this.outputDir}`);
 
+    // Check if input exists
     if (!fs.existsSync(this.inputDir)) {
       console.error(`❌ Input directory not found: ${this.inputDir}`);
+      console.log(
+        "💡 Make sure you have assets/flipbook/ folder with your flipbook files"
+      );
       return false;
     }
 
     // Clean output directory
     if (fs.existsSync(this.outputDir)) {
       fs.rmSync(this.outputDir, { recursive: true, force: true });
+      console.log("🗑️ Cleaned old encrypted files");
     }
-    fs.mkdirSync(this.outputDir, { recursive: true });
 
     let fileCount = 0;
     let encryptedCount = 0;
 
-    this.walkDirectory(this.inputDir, (filePath) => {
+    // Encrypt all files
+    this.walkDir(this.inputDir, (filePath) => {
       fileCount++;
 
-      // Get relative path from input directory
+      // Get relative path
       const relativePath = path.relative(this.inputDir, filePath);
       const outputPath = path.join(this.outputDir, relativePath + ".enc");
 
@@ -107,37 +103,25 @@ class FlipbookEncryptor {
       encryptedCount++;
     });
 
-    console.log(
-      `✅ Encryption complete! ${encryptedCount}/${fileCount} files encrypted`
-    );
+    console.log(`\n✅ Encryption complete!`);
+    console.log(`📊 Files processed: ${encryptedCount}/${fileCount}`);
     console.log(`📁 Encrypted files saved to: ${this.outputDir}`);
 
-    // Create encryption manifest
-    this.createManifest();
+    // Create simple manifest
+    this.createManifest(fileCount);
 
     return true;
   }
 
-  // Create manifest file for encrypted content
-  createManifest() {
+  // Create manifest file
+  createManifest(fileCount) {
     const manifest = {
       version: "1.0.0",
       encrypted: true,
-      algorithm: this.algorithm,
+      encryption_type: "XOR",
+      file_count: fileCount,
       created_at: new Date().toISOString(),
-      files: [],
     };
-
-    this.walkDirectory(this.outputDir, (filePath) => {
-      const relativePath = path.relative(this.outputDir, filePath);
-      const originalPath = relativePath.replace(".enc", "");
-
-      manifest.files.push({
-        original: originalPath,
-        encrypted: relativePath,
-        size: fs.statSync(filePath).size,
-      });
-    });
 
     const manifestPath = path.join(this.outputDir, "manifest.json");
     fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
@@ -145,51 +129,62 @@ class FlipbookEncryptor {
     console.log(`📋 Manifest created: ${manifestPath}`);
   }
 
-  // Generate decryption key based on license
-  generateDecryptionKey(licenseKey, deviceFingerprint) {
-    const combined = this.masterKey + licenseKey + deviceFingerprint;
-    return crypto.scryptSync(combined, "salt-decrypt-2025", 32);
+  // Test encryption/decryption
+  testEncryption() {
+    console.log("🧪 Testing encryption...");
+
+    const testData = "Hello, this is a test string for encryption!";
+    const testBuffer = Buffer.from(testData, "utf8");
+
+    console.log(`Original: ${testData}`);
+
+    const encrypted = this.encrypt(testBuffer, this.secretKey);
+    console.log(`Encrypted: ${encrypted.toString("hex")}`);
+
+    const decrypted = this.decrypt(encrypted, this.secretKey);
+    const decryptedText = decrypted.toString("utf8");
+    console.log(`Decrypted: ${decryptedText}`);
+
+    if (testData === decryptedText) {
+      console.log("✅ Encryption test PASSED");
+      return true;
+    } else {
+      console.log("❌ Encryption test FAILED");
+      return false;
+    }
   }
 }
 
-// CLI usage
+// Command line usage
 if (require.main === module) {
-  const encryptor = new FlipbookEncryptor();
+  const encryptor = new SimpleEncryptor();
 
   const command = process.argv[2];
 
-  if (command === "encrypt") {
-    encryptor.encryptFlipbook();
-  } else if (command === "test") {
-    // Test encryption/decryption
-    const testFile = process.argv[3];
-    if (testFile && fs.existsSync(testFile)) {
-      const outputFile = testFile + ".enc";
-      encryptor.encryptFile(testFile, outputFile);
+  switch (command) {
+    case "encrypt":
+      encryptor.encryptFlipbook();
+      break;
 
-      const key = encryptor.generateKey();
-      const decrypted = encryptor.decryptFile(outputFile, key);
+    case "test":
+      encryptor.testEncryption();
+      break;
 
-      if (decrypted) {
-        console.log("✅ Test successful - file can be encrypted and decrypted");
-      } else {
-        console.log("❌ Test failed");
-      }
-    } else {
-      console.log("Usage: node encrypt-flipbook.js test <file-path>");
-    }
-  } else {
-    console.log(`
-        🔐 Flipbook Encryptor
+    default:
+      console.log(`
+🔐 Simple Flipbook Encryptor
 
-        Usage:
-        node encrypt-flipbook.js encrypt    # Encrypt entire flipbook
-        node encrypt-flipbook.js test <file> # Test encryption on single file
+Usage:
+  node scripts/encrypt-flipbook.js encrypt    # Encrypt flipbook files
+  node scripts/encrypt-flipbook.js test       # Test encryption
 
-        This will:
-        1. Encrypt all files in assets/flipbook/
-        2. Save encrypted files to assets/flipbook-encrypted/
-        3. Create manifest.json with file mapping
-    `);
+This will:
+1. Read all files from assets/flipbook/
+2. Encrypt each file with XOR
+3. Save to assets/flipbook-encrypted/
+4. Create manifest.json
+      `);
   }
 }
+
+module.exports = SimpleEncryptor;

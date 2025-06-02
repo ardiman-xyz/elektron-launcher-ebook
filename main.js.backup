@@ -4,13 +4,13 @@ const path = require("path");
 // Import backend modules
 const ActivationManager = require("./src/activation");
 const DeviceManager = require("./src/device");
-const SimpleDecryptor = require("./src/SimpleDecryptor");
+
+console.log("🚀 Starting E-book Launcher...");
 
 let mainWindow;
 let ebookWindow;
 let activationManager;
 let deviceManager;
-let simpleDecryptor;
 
 app.whenReady().then(async () => {
   console.log("✅ App ready");
@@ -18,8 +18,6 @@ app.whenReady().then(async () => {
   // Initialize backend
   activationManager = new ActivationManager();
   deviceManager = new DeviceManager();
-
-  simpleDecryptor = new SimpleDecryptor();
 
   await createWindow();
 });
@@ -62,68 +60,72 @@ function loadDashboard() {
 
 async function createEbookWindow() {
   try {
-    console.log("📖 Starting e-book window with decryption...");
+    console.log("📖 Starting e-book window creation...");
 
     if (ebookWindow && !ebookWindow.isDestroyed()) {
       console.log("👁️ E-book window already exists, focusing...");
       ebookWindow.focus();
-      return { success: true, message: "E-book window focused" };
+      return;
     }
 
-    // Check if encrypted flipbook is available
-    if (!simpleDecryptor.isAvailable()) {
-      throw new Error("Encrypted flipbook not found");
+    const flipbookPath = path.join(
+      __dirname,
+      "assets",
+      "flipbook",
+      "index.html"
+    );
+    console.log("📁 Checking flipbook path:", flipbookPath);
+
+    if (!require("fs").existsSync(flipbookPath)) {
+      console.error("❌ Flipbook not found at:", flipbookPath);
+      throw new Error("E-book content not found at: " + flipbookPath);
     }
 
-    console.log("🔓 Decrypting flipbook...");
-    const indexPath = await simpleDecryptor.decryptFlipbook();
-
-    if (!indexPath) {
-      throw new Error("Failed to decrypt flipbook");
-    }
-
-    console.log("✅ Flipbook decrypted, creating window...");
-
-    const { screen } = require("electron");
-    const primaryDisplay = screen.getPrimaryDisplay();
-    const { width, height } = primaryDisplay.workAreaSize;
-
-    const ebookWidth = Math.min(1200, width - 50);
-    const ebookHeight = Math.min(850, height - 50);
+    console.log("✅ Flipbook found, creating window...");
 
     ebookWindow = new BrowserWindow({
-      width: ebookWidth,
-      height: ebookHeight,
+      width: 1200,
+      height: 850,
       minWidth: 900,
       minHeight: 700,
-      title: "📚 Protected E-book Viewer",
+      title: "📚 E-book Viewer",
       show: true,
-      center: true,
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
-        webSecurity: false, // Allow local files
+        webSecurity: false,
       },
       autoHideMenuBar: true,
     });
 
-    // Load decrypted flipbook
-    await ebookWindow.loadFile(indexPath);
+    console.log("🖼️ Window created, loading flipbook...");
+    await ebookWindow.loadFile(flipbookPath);
+    console.log("📄 Flipbook loaded successfully");
 
     ebookWindow.on("closed", () => {
-      // Cleanup temp files when window closes
-      if (simpleDecryptor) {
-        simpleDecryptor.cleanup();
-      }
       ebookWindow = null;
       console.log("📖 E-book window closed");
     });
 
-    console.log("✅ E-book window opened successfully");
-    return { success: true, message: "E-book opened with decryption" };
+    setTimeout(() => {
+      if (ebookWindow && !ebookWindow.isDestroyed()) {
+        ebookWindow.webContents
+          .executeJavaScript(
+            `
+                    const indicator = document.createElement("div");
+                    indicator.innerHTML = "📚 Protected E-book";
+                    indicator.style.cssText = "position: fixed; top: 10px; right: 10px; background: rgba(40, 167, 69, 0.9); color: white; padding: 8px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; z-index: 999999; font-family: Arial, sans-serif;";
+                    document.body.appendChild(indicator);
+                `
+          )
+          .catch((err) => console.log("Security injection error:", err));
+      }
+    }, 2000);
+
+    console.log("✅ E-book window setup completed");
   } catch (error) {
     console.error("❌ Error creating e-book window:", error);
-    return { success: false, message: error.message };
+    throw error;
   }
 }
 

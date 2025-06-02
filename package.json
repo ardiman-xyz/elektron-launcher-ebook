@@ -19,70 +19,20 @@
     "test": "echo \"No tests specified\""
   },
   "build": {
-    "appId": "com.ebook.launcher.secure",
-    "productName": "E-book Launcher Secure",
-    "directories": {
-      "output": "dist",
-      "buildResources": "build"
-    },
+    "appId": "com.ebook.launcher",
+    "productName": "E-book Launcher",
     "files": [
       "**/*",
       "!assets/flipbook/**/*",
-      "!node_modules/.cache/**/*",
-      "node_modules/crypto-js/**/*",
-      "node_modules/uuid/**/*",
-      "node_modules/node-machine-id/**/*",
-      "node_modules/systeminformation/**/*"
+      "!node_modules/.cache/**/*"
     ],
     "extraResources": [
       {
         "from": "assets/flipbook-encrypted",
         "to": "flipbook-encrypted",
-        "filter": [
-          "**/*"
-        ]
+        "filter": ["**/*"]
       }
-    ],
-    "win": {
-      "target": {
-        "target": "nsis",
-        "arch": [
-          "x64"
-        ]
-      },
-      "icon": "build/icons/icon.ico",
-      "compression": "maximum"
-    },
-    "mac": {
-      "target": {
-        "target": "dmg",
-        "arch": [
-          "x64",
-          "arm64"
-        ]
-      },
-      "icon": "build/icons/icon.icns",
-      "compression": "maximum"
-    },
-    "linux": {
-      "target": {
-        "target": "AppImage",
-        "arch": [
-          "x64"
-        ]
-      },
-      "icon": "build/icons/icon.png",
-      "compression": "maximum"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "installerIcon": "build/icons/icon.ico",
-      "uninstallerIcon": "build/icons/icon.ico"
-    },
-    "compression": "maximum"
+    ]
   },
   "keywords": [
     "ebook",
