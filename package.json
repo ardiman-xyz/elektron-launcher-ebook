@@ -19,20 +19,69 @@
     "test": "echo \"No tests specified\""
   },
   "build": {
-    "appId": "com.ebook.launcher",
+    "appId": "com.ebook.launcher.encrypted",
     "productName": "E-book Launcher",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
     "files": [
       "**/*",
       "!assets/flipbook/**/*",
-      "!node_modules/.cache/**/*"
+      "!node_modules/.cache/**/*",
+      "node_modules/crypto-js/**/*",
+      "node_modules/uuid/**/*",
+      "node_modules/node-machine-id/**/*",
+      "node_modules/systeminformation/**/*"
     ],
     "extraResources": [
       {
         "from": "assets/flipbook-encrypted",
         "to": "flipbook-encrypted",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       }
-    ]
+    ],
+    "win": {
+      "target": {
+        "target": "nsis",
+        "arch": [
+          "x64"
+        ]
+      },
+      "icon": null,
+      "compression": "maximum"
+    },
+    "mac": {
+      "target": {
+        "target": "dmg",
+        "arch": [
+          "x64",
+          "arm64"
+        ]
+      },
+      "icon": null,
+      "compression": "maximum"
+    },
+    "linux": {
+      "target": {
+        "target": "AppImage",
+        "arch": [
+          "x64"
+        ]
+      },
+      "icon": "build/icons/icon.png",
+      "compression": "maximum",
+      "category": "Education"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "compression": "maximum"
   },
   "keywords": [
     "ebook",
