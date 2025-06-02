@@ -85,7 +85,7 @@
     "electron",
     "protected"
   ],
-  "author": "Your Name <your.email@example.com>",
+  "author": "Ardiman",
   "license": "MIT",
   "devDependencies": {
     "electron": "^27.0.0",

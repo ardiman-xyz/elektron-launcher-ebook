@@ -120,19 +120,29 @@
       <h1>E-book Dashboard</h1>
       <div class="status">✅ Licensed & Active</div>
 
-      <button class="launch-btn internal" id="btn-internal">
+      <button
+        class="launch-btn internal"
+        onclick="launchInternal()"
+        id="btn-internal"
+      >
         📖 Open Internal Window
       </button>
 
-      <button class="launch-btn browser" id="btn-browser">
+      <button
+        class="launch-btn browser"
+        onclick="launchBrowser()"
+        id="btn-browser"
+      >
         🌐 Open in Browser
       </button>
 
       <div class="menu-grid">
-        <button class="menu-btn" id="btn-info">ℹ️ License Info</button>
-        <button class="menu-btn" id="btn-settings">⚙️ Settings</button>
-        <button class="menu-btn" id="btn-reset">🔄 Reset License</button>
-        <button class="menu-btn" id="btn-exit">❌ Exit App</button>
+        <button class="menu-btn" onclick="showInfo()">ℹ️ License Info</button>
+        <button class="menu-btn" onclick="showSettings()">⚙️ Settings</button>
+        <button class="menu-btn" onclick="resetLicense()">
+          🔄 Reset License
+        </button>
+        <button class="menu-btn" onclick="exitApp()">❌ Exit App</button>
       </div>
     </div>
 
