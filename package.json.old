@@ -21,9 +21,6 @@
   "build": {
     "appId": "com.ebook.launcher",
     "productName": "E-book Launcher",
-    "directories": {
-      "output": "dist"
-    },
     "files": [
       "**/*",
       "!assets/flipbook/**/*",
@@ -33,32 +30,9 @@
       {
         "from": "assets/flipbook-encrypted",
         "to": "flipbook-encrypted",
-        "filter": [
-          "**/*"
-        ]
+        "filter": ["**/*"]
       }
-    ],
-    "win": {
-      "target": "nsis",
-      "icon": null,
-      "artifactName": "${productName}-${version}-setup.${ext}"
-    },
-    "linux": {
-      "target": "AppImage",
-      "category": "Office",
-      "artifactName": "${productName}-${version}.${ext}"
-    },
-    "mac": {
-      "target": "dmg",
-      "category": "public.app-category.productivity",
-      "artifactName": "${productName}-${version}.${ext}"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true
-    }
+    ]
   },
   "keywords": [
     "ebook",
@@ -70,8 +44,8 @@
   "author": "Ardiman",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^28.0.0",
-    "electron-builder": "^24.13.3",
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4",
     "nodemon": "^3.0.1",
     "concurrently": "^8.2.2"
   },

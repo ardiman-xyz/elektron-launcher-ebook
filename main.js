@@ -1,27 +1,30 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 
-// Import backend modules
-const ActivationManager = require("./src/activation");
-const DeviceManager = require("./src/device");
+// Import modules
+const SimpleLicense = require("./src/SimpleLicense");
 const SimpleDecryptor = require("./src/SimpleDecryptor");
 
 let mainWindow;
 let ebookWindow;
-let activationManager;
-let deviceManager;
-let simpleDecryptor;
+let license;
+let sessionId; // Track current session
+let sessionStartTime;
 
 app.whenReady().then(async () => {
   console.log("✅ App ready");
 
-  // Initialize backend
-  activationManager = new ActivationManager();
-  deviceManager = new DeviceManager();
+  // Initialize license
+  license = new SimpleLicense();
 
-  simpleDecryptor = new SimpleDecryptor();
+  // Start session tracking
+  sessionId = generateSessionId();
+  sessionStartTime = new Date();
 
   await createWindow();
+
+  // Log app start
+  await logAppUsage("app_start");
 });
 
 async function createWindow() {
@@ -36,53 +39,88 @@ async function createWindow() {
     },
   });
 
-  // Check activation and load appropriate page
-  const isActivated = await activationManager.checkActivation();
+  // Check license
+  const isValid = await license.isValid();
 
-  if (isActivated) {
+  if (isValid) {
     loadDashboard();
   } else {
     loadActivationPage();
   }
 
-  if (process.env.NODE_ENV === "development") {
-    mainWindow.webContents.openDevTools();
-  }
+  // Window events
+  mainWindow.on("closed", async () => {
+    await logAppUsage("app_close");
+  });
 }
 
 function loadActivationPage() {
-  console.log("📄 Loading activation page...");
   mainWindow.loadFile("app/activation.html");
 }
 
 function loadDashboard() {
-  console.log("📊 Loading dashboard...");
   mainWindow.loadFile("app/dashboard.html");
 }
 
-async function createEbookWindow() {
-  try {
-    console.log("📖 Starting e-book window with decryption...");
+// === IPC HANDLERS ===
 
+// Activate license
+ipcMain.handle("activate-license", async (event, licenseKey) => {
+  const result = await license.activate(licenseKey);
+
+  if (result.success) {
+    // Log successful activation
+    await logAppUsage("license_activated", null, {
+      license_type: result.data?.type,
+    });
+
+    setTimeout(() => loadDashboard(), 2000);
+  }
+
+  return result;
+});
+
+// Get license info
+ipcMain.handle("get-activation-info", async () => {
+  return await license.getLicenseInfo();
+});
+
+// Reset license
+ipcMain.handle("reset-activation", async () => {
+  await logAppUsage("license_reset");
+  const result = await license.reset();
+  loadActivationPage();
+  return result;
+});
+
+// Launch ebook
+ipcMain.handle("launch-ebook-internal", async () => {
+  const isValid = await license.isValid();
+
+  if (!isValid) {
+    return { success: false, message: "No valid license" };
+  }
+
+  try {
+    // Log ebook launch
+    await logAppUsage("ebook_launched");
+
+    // Create ebook window (existing logic)
     if (ebookWindow && !ebookWindow.isDestroyed()) {
-      console.log("👁️ E-book window already exists, focusing...");
       ebookWindow.focus();
-      return { success: true, message: "E-book window focused" };
+      return { success: true, message: "Ebook window focused" };
     }
 
     // Check if encrypted flipbook is available
+    const simpleDecryptor = new SimpleDecryptor();
     if (!simpleDecryptor.isAvailable()) {
       throw new Error("Encrypted flipbook not found");
     }
 
-    console.log("🔓 Decrypting flipbook...");
     const indexPath = await simpleDecryptor.decryptFlipbook();
-
     if (!indexPath) {
       throw new Error("Failed to decrypt flipbook");
     }
-
-    console.log("✅ Flipbook decrypted, creating window...");
 
     const { screen } = require("electron");
     const primaryDisplay = screen.getPrimaryDisplay();
@@ -102,126 +140,129 @@ async function createEbookWindow() {
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
-        webSecurity: false, // Allow local files
+        webSecurity: false,
       },
       autoHideMenuBar: true,
     });
 
-    // Load decrypted flipbook
     await ebookWindow.loadFile(indexPath);
 
-    ebookWindow.on("closed", () => {
-      // Cleanup temp files when window closes
+    // Track ebook usage
+    let pagesViewed = 0;
+    let timeSpentReading = Date.now();
+
+    ebookWindow.webContents.on("did-finish-load", async () => {
+      await logAppUsage("ebook_opened");
+    });
+
+    ebookWindow.on("closed", async () => {
+      const readingDuration = Math.floor(
+        (Date.now() - timeSpentReading) / 1000
+      );
+
+      await logAppUsage("ebook_closed", null, {
+        pages_viewed: pagesViewed,
+        reading_duration: readingDuration,
+      });
+
       if (simpleDecryptor) {
         simpleDecryptor.cleanup();
       }
       ebookWindow = null;
-      console.log("📖 E-book window closed");
     });
 
-    console.log("✅ E-book window opened successfully");
-    return { success: true, message: "E-book opened with decryption" };
+    return { success: true, message: "Ebook launched successfully" };
   } catch (error) {
-    console.error("❌ Error creating e-book window:", error);
+    console.error("❌ Error launching ebook:", error);
+    await logAppUsage("ebook_launch_failed", null, { error: error.message });
     return { success: false, message: error.message };
   }
-}
+});
 
-// IPC Handlers
-ipcMain.handle("activate-license", async (event, licenseKey) => {
-  console.log("🔑 Processing activation...");
-
+// Check feature availability
+ipcMain.handle("check-feature", async (event, featureName) => {
   try {
-    const deviceFingerprint = await deviceManager.getDeviceFingerprint();
-    const result = await activationManager.activateLicense(
-      licenseKey,
-      deviceFingerprint
-    );
+    const licenseInfo = await license.getLicenseInfo();
+    const hasFeature = licenseInfo.features.includes(featureName);
 
-    if (result.success) {
-      setTimeout(() => loadDashboard(), 2000);
+    if (hasFeature) {
+      await logAppUsage("feature_checked", featureName);
     }
 
-    return result;
+    return {
+      hasFeature: hasFeature,
+      licenseType: licenseInfo.type,
+    };
   } catch (error) {
-    return { success: false, message: error.message };
+    return { hasFeature: false, licenseType: "none" };
   }
 });
 
-ipcMain.handle("get-activation-info", async () => {
-  return await activationManager.getActivationData();
+// Log feature usage
+ipcMain.handle("log-feature-usage", async (event, featureName, data = {}) => {
+  await logAppUsage("feature_used", featureName, data);
+  return { success: true };
 });
 
-ipcMain.handle("reset-activation", async () => {
-  const result = await activationManager.resetActivation();
-  loadActivationPage();
-  return result;
-});
+// Get usage stats
+ipcMain.handle("get-usage-stats", async () => {
+  const sessionDuration = Math.floor((new Date() - sessionStartTime) / 1000);
 
-ipcMain.handle("close-app", () => {
-  app.quit();
-});
-
-// E-book launch handlers
-ipcMain.handle("launch-ebook-internal", async () => {
-  try {
-    console.log("🏠 Launching internal e-book window...");
-    await createEbookWindow();
-    return { success: true, message: "E-book opened in internal window" };
-  } catch (error) {
-    console.error("❌ Error launching internal e-book:", error);
-    return { success: false, message: error.message };
-  }
-});
-
-ipcMain.handle("close-ebook-window", () => {
-  if (ebookWindow && !ebookWindow.isDestroyed()) {
-    ebookWindow.close();
-    ebookWindow = null;
-    return { success: true };
-  }
-  return { success: false, message: "No e-book window to close" };
-});
-
-ipcMain.handle("get-activation-path", async () => {
   return {
-    activationFile: activationManager.activationFile,
-    userDataPath: app.getPath("userData"),
+    sessionId: sessionId,
+    sessionDuration: sessionDuration,
+    sessionStart: sessionStartTime.toISOString(),
   };
 });
 
-app.on("window-all-closed", () => {
+// Close app
+ipcMain.handle("close-app", async () => {
+  await logAppUsage("app_close");
+  app.quit();
+});
+
+// === USAGE TRACKING ===
+
+async function logAppUsage(action, feature = null, additionalData = {}) {
+  try {
+    const usageData = {
+      sessionId: sessionId,
+      action: action,
+      feature: feature,
+      sessionStart: sessionStartTime.toISOString(),
+      ...additionalData,
+    };
+
+    // Add session end time for closing actions
+    if (action.includes("close") || action.includes("exit")) {
+      usageData.sessionEnd = new Date().toISOString();
+      usageData.duration = Math.floor((new Date() - sessionStartTime) / 1000);
+    }
+
+    await license.logUsage(usageData);
+    console.log(`📊 Logged usage: ${action}${feature ? " - " + feature : ""}`);
+  } catch (error) {
+    console.warn("Failed to log usage:", error.message);
+  }
+}
+
+function generateSessionId() {
+  return (
+    "session_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9)
+  );
+}
+
+// App events
+app.on("window-all-closed", async () => {
+  await logAppUsage("all_windows_closed");
+
   if (process.platform !== "darwin") {
     app.quit();
   }
 });
 
-console.log("📝 Main process ready with internal e-book launcher");
-
-// Browser launch handler
-ipcMain.handle("launch-ebook-browser", async () => {
-  try {
-    console.log("🌐 Launching e-book in browser...");
-
-    const flipbookPath = path.join(
-      __dirname,
-      "assets",
-      "flipbook",
-      "index.html"
-    );
-
-    if (!require("fs").existsSync(flipbookPath)) {
-      throw new Error("E-book content not found");
-    }
-
-    // Open in default browser
-    const { shell } = require("electron");
-    await shell.openPath(flipbookPath);
-
-    console.log("✅ E-book opened in browser");
-    return { success: true, message: "E-book opened in default browser" };
-  } catch (error) {
-    console.error("❌ Error launching browser e-book:", error);
-    return { success: false, message: error.message };
-  }
+app.on("before-quit", async () => {
+  await logAppUsage("app_before_quit");
 });
+
+console.log("📝 Enhanced license system with usage tracking ready");
