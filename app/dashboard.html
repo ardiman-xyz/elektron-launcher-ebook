@@ -433,24 +433,24 @@
 
               // Show dialog like in the image
               alert(`📋 License: ${maskedKey}
-                Status: Active
-                Platform: ${platformDisplay}`);
+Status: Active
+Platform: ${platformDisplay}`);
             } else {
               // No activation data found
               alert(`📋 License: DEMO-1234-****
-                Status: Demo Mode
-                Platform: ${navigator.platform}`);
+Status: Demo Mode
+Platform: ${navigator.platform}`);
             }
           } else {
             // Electron API not available
             alert(`📋 License: EVAL-0000-****
-            Status: Browser Mode
-            Platform: ${navigator.platform}`);
+Status: Browser Mode
+Platform: ${navigator.platform}`);
           }
         } catch (error) {
           console.error("❌ Error loading license info:", error);
           alert(`📋 Error loading license information
-        ${error.message}`);
+${error.message}`);
         }
       }
 

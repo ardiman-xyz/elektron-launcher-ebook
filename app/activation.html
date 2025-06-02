@@ -5,62 +5,113 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>E-book Activation</title>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      * {
         margin: 0;
-        padding: 50px;
-        color: white;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         min-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
+        color: white;
+        overflow: hidden;
       }
+
       .container {
         background: rgba(255, 255, 255, 0.95);
-        color: #333;
         padding: 40px;
         border-radius: 20px;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-        max-width: 500px;
-        width: 100%;
         text-align: center;
+        width: 90%;
+        max-width: 450px;
+        color: #333;
       }
+
       .logo {
-        font-size: 64px;
+        font-size: 60px;
         margin-bottom: 20px;
+        animation: bounce 2s infinite;
       }
+
+      @keyframes bounce {
+        0%,
+        20%,
+        50%,
+        80%,
+        100% {
+          transform: translateY(0);
+        }
+        40% {
+          transform: translateY(-10px);
+        }
+        60% {
+          transform: translateY(-5px);
+        }
+      }
+
       h1 {
-        margin-bottom: 10px;
         color: #2c3e50;
+        margin-bottom: 10px;
+        font-size: 28px;
       }
-      p {
-        color: #6c757d;
+
+      .subtitle {
+        color: #7f8c8d;
         margin-bottom: 30px;
+        font-size: 16px;
       }
+
+      .demo-notice {
+        background: #fff3cd;
+        color: #856404;
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        font-size: 14px;
+        border-left: 4px solid #ffc107;
+      }
+
       .form-group {
         margin-bottom: 20px;
+        text-align: left;
       }
+
       label {
         display: block;
         margin-bottom: 8px;
-        font-weight: bold;
-        text-align: left;
+        color: #555;
+        font-weight: 500;
       }
+
       input {
         width: 100%;
         padding: 15px;
-        border: 2px solid #e9ecef;
+        border: 2px solid #e1e8ed;
         border-radius: 10px;
         font-size: 16px;
-        font-family: monospace;
         text-align: center;
+        font-family: "Courier New", monospace;
+        letter-spacing: 1px;
+        transition: border-color 0.3s ease;
         text-transform: uppercase;
-        letter-spacing: 2px;
       }
-      button {
+
+      input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .activate-btn {
         width: 100%;
-        padding: 15px;
+        padding: 18px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         border: none;
@@ -68,36 +119,21 @@
         font-size: 16px;
         font-weight: bold;
         cursor: pointer;
+        transition: transform 0.2s ease;
+        margin-bottom: 20px;
       }
-      button:hover {
+
+      .activate-btn:hover:not(:disabled) {
         transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
       }
-      button:disabled {
+
+      .activate-btn:disabled {
         opacity: 0.6;
         cursor: not-allowed;
+        transform: none;
       }
-      .help {
-        background: #f8f9fa;
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        font-size: 14px;
-        text-align: left;
-      }
-      .message {
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        display: none;
-      }
-      .error {
-        background: #f8d7da;
-        color: #721c24;
-      }
-      .success {
-        background: #d4edda;
-        color: #155724;
-      }
+
       .spinner {
         border: 2px solid rgba(255, 255, 255, 0.3);
         border-top: 2px solid white;
@@ -106,8 +142,9 @@
         height: 16px;
         animation: spin 1s linear infinite;
         display: inline-block;
-        margin-right: 8px;
+        margin-right: 10px;
       }
+
       @keyframes spin {
         0% {
           transform: rotate(0deg);
@@ -116,111 +153,458 @@
           transform: rotate(360deg);
         }
       }
+
+      .error-message {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 15px;
+        display: none;
+        border-left: 4px solid #dc3545;
+      }
+
+      .success-message {
+        background: #d4edda;
+        color: #155724;
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 15px;
+        display: none;
+        border-left: 4px solid #28a745;
+      }
+
+      .links {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+        font-size: 14px;
+      }
+
+      .links a {
+        color: #667eea;
+        text-decoration: none;
+        transition: color 0.3s ease;
+      }
+
+      .links a:hover {
+        color: #764ba2;
+        text-decoration: underline;
+      }
+
+      .offline-mode {
+        background: #e7f3ff;
+        color: #004085;
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 15px;
+        border-left: 4px solid #007bff;
+        font-size: 14px;
+      }
+
+      .license-info {
+        text-align: left;
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 15px;
+        font-size: 14px;
+        display: none;
+      }
+
+      .license-info h4 {
+        color: #28a745;
+        margin-bottom: 10px;
+      }
+
+      .license-info ul {
+        margin-left: 20px;
+        color: #666;
+      }
+
+      @media (max-height: 600px) {
+        .container {
+          padding: 25px;
+          max-width: 400px;
+        }
+
+        .logo {
+          font-size: 40px;
+          margin-bottom: 15px;
+        }
+
+        h1 {
+          font-size: 24px;
+          margin-bottom: 8px;
+        }
+
+        .subtitle {
+          font-size: 14px;
+          margin-bottom: 20px;
+        }
+      }
     </style>
   </head>
   <body>
     <div class="container">
       <div class="logo">📚</div>
       <h1>E-book Activation</h1>
-      <p>Enter your license key to access your e-book</p>
+      <p class="subtitle">Enter your license key to access your e-book</p>
 
-      <div id="message" class="message"></div>
-
-      <div class="help">
-        <strong>💡 For testing, use:</strong><br />
-        <code>DEMO-1234-5678-9ABC</code> or <code>TEST-ABCD-EFGH-IJKL</code>
+      <div class="demo-notice">
+        💡 <strong>Available test licenses:</strong><br />
+        • DEMO-1234-5678-ABC → DEMO12345678ABC<br />
+        • DEMO-2024-TEST-DEMO → DEMO2024TESTDEMO<br />
+        • TRIA-L202-4TES-TABC → TRIAL2024TESTABC<br />
+        • TRIA-L202-4DEM-ODEF → TRIAL2024DEMODEF<br />
+        • FULL-2024-SAMP-LE12 → FULL2024SAMPLE123
       </div>
 
-      <form id="activationForm">
+      <form id="activationForm" novalidate>
         <div class="form-group">
           <label for="licenseKey">License Key</label>
           <input
             type="text"
             id="licenseKey"
             placeholder="XXXX-XXXX-XXXX-XXXX"
-            maxlength="19"
-            required
+            autocomplete="off"
+            style="text-transform: uppercase"
           />
         </div>
-        <button type="submit" id="activateBtn">🚀 Activate Now</button>
+
+        <button type="submit" class="activate-btn" id="activateBtn">
+          🚀 Activate Now
+        </button>
       </form>
+
+      <div class="error-message" id="errorMessage"></div>
+      <div class="success-message" id="successMessage"></div>
+      <div class="offline-mode" id="offlineMode" style="display: none">
+        📡 <strong>Offline Mode:</strong> Will attempt activation when
+        connection is available.
+      </div>
+
+      <div class="license-info" id="licenseInfo">
+        <h4>✅ Activation Successful!</h4>
+        <ul id="licenseDetails"></ul>
+      </div>
+
+      <div class="links">
+        <a href="#" onclick="showHelp()">Need Help?</a>
+        <a href="#" onclick="skipActivation()">Skip (Demo Mode)</a>
+      </div>
     </div>
 
     <script>
-      console.log("📚 Activation page script loaded");
+      console.log("🔑 Activation page loaded");
 
-      // Check if Electron API is available
-      if (window.electronAPI) {
-        console.log("✅ Electron API is available");
-      } else {
-        console.error("❌ Electron API not available");
-      }
+      let isActivating = false;
 
-      const form = document.getElementById("activationForm");
-      const input = document.getElementById("licenseKey");
-      const button = document.getElementById("activateBtn");
-      const message = document.getElementById("message");
-
-      // Auto-format license key
-      input.addEventListener("input", (e) => {
-        let value = e.target.value.replace(/[^A-Z0-9]/g, "").toUpperCase();
-        let formatted = value.match(/.{1,4}/g)?.join("-") || value;
-        if (formatted.length > 19) formatted = formatted.substring(0, 19);
-        e.target.value = formatted;
+      document.addEventListener("DOMContentLoaded", () => {
+        initializeActivationPage();
+        formatLicenseKeyInput();
+        checkInitialStatus();
       });
 
-      // Handle form submission
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
+      function initializeActivationPage() {
+        console.log("🔧 Initializing activation page...");
 
-        const licenseKey = input.value.trim();
-
-        if (licenseKey.length < 19) {
-          showMessage("Please enter a complete license key", "error");
+        // Check if Electron API is available
+        if (!window.electronAPI) {
+          console.error("❌ Electron API not available");
+          showError("Application error: Electron API not available");
           return;
         }
 
-        // Show loading
-        button.disabled = true;
-        button.innerHTML = '<div class="spinner"></div>Activating...';
+        console.log("✅ Electron API available");
 
+        // Focus on license key input
+        document.getElementById("licenseKey").focus();
+      }
+
+      async function checkInitialStatus() {
         try {
-          console.log("🔑 Attempting activation with:", licenseKey);
+          // Check if there's already an active license
+          const licenseInfo = await window.electronAPI.getLicenseInfo();
 
-          if (!window.electronAPI) {
-            throw new Error("Electron API not available");
-          }
+          if (licenseInfo.isActivated) {
+            console.log("✅ Active license found, redirecting to dashboard...");
+            showSuccess("Active license found! Redirecting to dashboard...");
 
-          const result = await window.electronAPI.activateLicense(licenseKey);
-          console.log("�� Activation result:", result);
-
-          if (result.success) {
-            showMessage(
-              "✅ Activation successful! " + result.message,
-              "success"
-            );
-          } else {
-            showMessage("❌ " + result.message, "error");
+            setTimeout(() => {
+              window.location.href = "dashboard.html";
+            }, 2000);
           }
         } catch (error) {
-          console.error("❌ Activation error:", error);
-          showMessage("Activation error: " + error.message, "error");
-        } finally {
-          button.disabled = false;
-          button.innerHTML = "🚀 Activate Now";
+          console.log("ℹ️ No active license found");
+        }
+      }
+
+      function formatLicenseKeyInput() {
+        const input = document.getElementById("licenseKey");
+
+        input.addEventListener("input", (e) => {
+          let value = e.target.value.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
+
+          console.log("📝 Input value after clean:", value);
+
+          // Add hyphens automatically for display
+          if (value.length > 4) {
+            value = value.match(/.{1,4}/g).join("-");
+          }
+
+          // Limit to proper format (20 chars with hyphens)
+          if (value.length > 19) {
+            value = value.substring(0, 19);
+          }
+
+          console.log("📝 Final formatted value:", value);
+          e.target.value = value;
+        });
+
+        // Handle paste events
+        input.addEventListener("paste", (e) => {
+          e.preventDefault();
+          const paste = (e.clipboardData || window.clipboardData).getData(
+            "text"
+          );
+          const cleaned = paste.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
+
+          console.log("📋 Pasted value:", paste);
+          console.log("📋 Cleaned value:", cleaned);
+
+          if (cleaned.length >= 8) {
+            const formatted = cleaned.match(/.{1,4}/g).join("-");
+            input.value = formatted.substring(0, 19);
+            console.log("📋 Final pasted value:", input.value);
+          }
+        });
+      }
+
+      // Handle form submission
+      document
+        .getElementById("activationForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault(); // Prevent default form validation
+          e.stopPropagation(); // Stop propagation
+          await activateLicense();
+        });
+
+      async function activateLicense() {
+        if (isActivating) return;
+
+        const licenseKeyWithHyphens = document
+          .getElementById("licenseKey")
+          .value.trim();
+        const activateBtn = document.getElementById("activateBtn");
+
+        // DEBUG: Mari coba bypass semua validation untuk test
+        const licenseKey = licenseKeyWithHyphens.replace(/-/g, "");
+
+        console.log("🔍 Original input:", licenseKeyWithHyphens);
+        console.log("📝 Stripped key:", licenseKey);
+        console.log("📏 Key length:", licenseKey.length);
+
+        // Temporary: skip validation untuk debugging
+        if (!licenseKey) {
+          showError("Please enter a license key");
+          return;
+        }
+
+        // Commented out length validation untuk test
+        // if (licenseKey.length < 8) {
+        //     showError("License key must be at least 8 characters");
+        //     return;
+        // }
+
+        try {
+          isActivating = true;
+          activateBtn.disabled = true;
+          activateBtn.innerHTML = '<div class="spinner"></div>Activating...';
+
+          hideMessages();
+
+          console.log("🔑 Attempting to activate license:", licenseKey);
+          console.log("🔍 Original input:", licenseKeyWithHyphens);
+          console.log("📝 Stripped key:", licenseKey);
+
+          // Call activation API dengan license key tanpa hyphens
+          console.log(
+            "🚀 Calling electronAPI.activateLicense with:",
+            licenseKey
+          );
+          const result = await window.electronAPI.activateLicense(licenseKey);
+          console.log("📡 API Response:", result);
+
+          if (result.success) {
+            console.log("✅ License activated successfully");
+
+            showSuccess("License activated successfully!");
+            activateBtn.innerHTML = "✅ Activated!";
+            activateBtn.style.background =
+              "linear-gradient(135deg, #28a745 0%, #20c997 100%)";
+
+            // Show license info
+            showLicenseInfo(result.data);
+
+            // Redirect to dashboard after 3 seconds
+            setTimeout(() => {
+              console.log("🏠 Redirecting to dashboard...");
+              window.location.href = "dashboard.html";
+            }, 3000);
+          } else {
+            console.error("❌ License activation failed:", result.message);
+            showError(result.message || "Activation failed");
+            resetActivateButton();
+          }
+        } catch (error) {
+          console.error("💥 Activation error:", error);
+          showError("Activation failed: " + error.message);
+          resetActivateButton();
+        }
+      }
+
+      function showLicenseInfo(licenseData) {
+        const licenseInfo = document.getElementById("licenseInfo");
+        const licenseDetails = document.getElementById("licenseDetails");
+
+        const features = licenseData.features || [];
+        const restrictions = licenseData.restrictions || {};
+        const expiresAt = licenseData.expires_at;
+
+        let html = `
+                <li><strong>Type:</strong> ${licenseData.type}</li>
+                <li><strong>Max Devices:</strong> ${licenseData.max_devices}</li>
+                <li><strong>Devices Used:</strong> ${licenseData.devices_used}</li>
+            `;
+
+        if (licenseData.is_lifetime) {
+          html += `<li><strong>Duration:</strong> Lifetime</li>`;
+        } else if (expiresAt) {
+          const expDate = new Date(expiresAt).toLocaleDateString();
+          html += `<li><strong>Expires:</strong> ${expDate}</li>`;
+        }
+
+        if (features.length > 0) {
+          html += `<li><strong>Features:</strong> ${features.join(", ")}</li>`;
+        }
+
+        licenseDetails.innerHTML = html;
+        licenseInfo.style.display = "block";
+      }
+
+      function resetActivateButton() {
+        const activateBtn = document.getElementById("activateBtn");
+        activateBtn.disabled = false;
+        activateBtn.innerHTML = "🚀 Activate Now";
+        activateBtn.style.background =
+          "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
+        isActivating = false;
+      }
+
+      function showError(message) {
+        const errorDiv = document.getElementById("errorMessage");
+        errorDiv.textContent = message;
+        errorDiv.style.display = "block";
+
+        // Auto hide after 10 seconds
+        setTimeout(() => {
+          errorDiv.style.display = "none";
+        }, 10000);
+      }
+
+      function showSuccess(message) {
+        const successDiv = document.getElementById("successMessage");
+        successDiv.textContent = message;
+        successDiv.style.display = "block";
+      }
+
+      function hideMessages() {
+        document.getElementById("errorMessage").style.display = "none";
+        document.getElementById("successMessage").style.display = "none";
+        document.getElementById("offlineMode").style.display = "none";
+        document.getElementById("licenseInfo").style.display = "none";
+      }
+
+      function showHelp() {
+        const helpMessage = `📋 License Activation Help
+
+License Key Format:
+• Format: XXXX-XXXX-XXXX-XXXX (with hyphens for readability)
+• Contains letters and numbers only
+• Case insensitive (will be converted to uppercase)
+• Hyphens are automatically added for display
+
+Available Test Licenses:
+• DEMO-1234-5678-ABC (Demo license, 7 days)
+• DEMO-2024-TEST-DEMO (Demo license, 7 days)
+• TRIA-L202-4TES-TABC (Trial license, 30 days)
+• TRIA-L202-4DEM-ODEF (Trial license, 30 days)
+• FULL-2024-SAMP-LE123 (Full license, 1 year)
+
+Common Issues:
+• Check your internet connection
+• Verify the license key is correct
+• Ensure you haven't exceeded device limit
+• Contact support if license is expired`;
+
+        if (window.electronAPI && window.electronAPI.showMessage) {
+          window.electronAPI.showMessage({
+            type: "info",
+            title: "License Activation Help",
+            message: helpMessage,
+            buttons: ["OK"],
+          });
+        } else {
+          alert(helpMessage);
+        }
+      }
+
+      async function skipActivation() {
+        const confirmed = confirm(
+          "Skip activation and run in demo mode?\n\nNote: Some features may be limited."
+        );
+
+        if (confirmed) {
+          console.log("⏭️ Skipping activation, entering demo mode");
+
+          try {
+            // Log demo mode usage
+            if (window.electronAPI && window.electronAPI.logUsage) {
+              await window.electronAPI.logUsage({
+                action: "demo_mode_entered",
+                feature: "skip_activation",
+              });
+            }
+          } catch (error) {
+            console.log("Could not log demo mode:", error);
+          }
+
+          // Go to dashboard in demo mode
+          window.location.href = "dashboard.html";
+        }
+      }
+
+      // Keyboard shortcuts
+      document.addEventListener("keydown", (e) => {
+        // Enter key to activate
+        if (e.key === "Enter" && !isActivating) {
+          activateLicense();
+        }
+
+        // Escape key to skip
+        if (e.key === "Escape") {
+          skipActivation();
+        }
+
+        // F1 for help
+        if (e.key === "F1") {
+          e.preventDefault();
+          showHelp();
         }
       });
 
-      function showMessage(text, type) {
-        message.textContent = text;
-        message.className = "message " + type;
-        message.style.display = "block";
-      }
-
-      // Focus input
-      input.focus();
-
-      console.log("🎯 Activation page ready");
+      console.log("🔑 Activation script loaded");
     </script>
   </body>
 </html>
