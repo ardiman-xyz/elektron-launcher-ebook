@@ -16,6 +16,11 @@ contextBridge.exposeInMainWorld("electronAPI", {
   launchEbookInternal: () => ipcRenderer.invoke("launch-ebook-internal"),
   closeApp: () => ipcRenderer.invoke("close-app"),
 
+  // Navigation - TAMBAHAN INI
+  navigateToInfo: () => ipcRenderer.invoke("navigate-to-info"),
+  navigateToDashboard: () => ipcRenderer.invoke("navigate-to-dashboard"),
+  navigateToActivation: () => ipcRenderer.invoke("navigate-to-activation"),
+
   // System info
   getSystemInfo: () => ipcRenderer.invoke("get-system-info"),
 

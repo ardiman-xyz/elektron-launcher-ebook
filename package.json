@@ -70,15 +70,16 @@
   "author": "Ardiman",
   "license": "MIT",
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "electron": "^28.0.0",
     "electron-builder": "^24.13.3",
-    "nodemon": "^3.0.1",
-    "concurrently": "^8.2.2"
+    "nodemon": "^3.0.1"
   },
   "dependencies": {
     "crypto-js": "^4.2.0",
-    "uuid": "^9.0.1",
+    "dotenv": "^16.5.0",
     "node-machine-id": "^1.1.12",
-    "systeminformation": "^5.21.8"
+    "systeminformation": "^5.21.8",
+    "uuid": "^9.0.1"
   }
 }

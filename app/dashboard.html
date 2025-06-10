@@ -481,34 +481,47 @@ ${error.message}`);
         }
       }
 
-      function showBookInfo() {
+      async function showBookInfo() {
         console.log("📖 Opening book info page...");
 
         try {
-          // Navigate to info page
-          window.location.href = "info.html";
+          // Gunakan electron API untuk navigasi
+          if (window.electronAPI && window.electronAPI.navigateToInfo) {
+            const result = await window.electronAPI.navigateToInfo();
+
+            if (result.success) {
+              console.log("✅ Successfully navigated to info page");
+            } else {
+              console.error("❌ Failed to navigate:", result.message);
+              showFallbackInfo();
+            }
+          } else {
+            console.warn("⚠️ Navigation API not available, showing fallback");
+            showFallbackInfo();
+          }
         } catch (error) {
-          console.error("Error opening info page:", error);
-
-          // Fallback: show info in alert
-          alert(`📚 E-book Information
-                  
-Title: Kepala Sekolah Sebagai Pemimpin Pembelajaran Inovatif
-Author: Hasma Nurjaya
-Year: 2025
-Pages: 347
-Size: 25.4 MB
-Format: Interactive PDF
-Category: Inovatif, Pembelajaran & Pemimpin
-Language: Bahasa Indonesia
-Publisher: Digital Learning Press
-ISBN: 978-602-1234-56-7
-
-Description: Buku komprehensif tentang kepemimpinan pembelajaran inovatif.`);
+          console.error("❌ Error navigating to info page:", error);
+          showFallbackInfo();
         }
       }
 
-      console.log("📊 Dashboard script loaded");
+      // Fallback function untuk menampilkan info di alert
+      function showFallbackInfo() {
+        alert(`📚 E-book Information
+                        
+      Title: Kepala Sekolah Sebagai Pemimpin Pembelajaran Inovatif
+      Author: Hasma Nurjaya
+      Year: 2025
+      Pages: 347
+      Size: 25.4 MB
+      Format: Interactive PDF
+      Category: Inovatif, Pembelajaran & Pemimpin
+      Language: Bahasa Indonesia
+      Publisher: Digital Learning Press
+      ISBN: 978-602-1234-56-7
+
+      Description: Buku komprehensif tentang kepemimpinan pembelajaran inovatif.`);
+      }
     </script>
   </body>
 </html>

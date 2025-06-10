@@ -10,7 +10,7 @@ const os = require("os");
 class SimpleLicense {
   constructor() {
     this.licenseFile = path.join(app.getPath("userData"), "license.json");
-    this.apiUrl = process.env.LICENSE_API_URL || "http://127.0.0.1:8001/api"; // Laravel API URL
+    this.apiUrl = "https://ebook-inobel.id/api";
   }
 
   // Aktivasi license - panggil API Laravel

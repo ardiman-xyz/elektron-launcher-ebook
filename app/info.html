@@ -639,21 +639,6 @@
           <div class="book-year">Published 2024</div>
         </div>
 
-        <div class="stats-grid">
-          <div class="stat-item">
-            <div class="stat-value">347</div>
-            <div class="stat-label">Pages</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value">25.4</div>
-            <div class="stat-label">MB Size</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value">PDF</div>
-            <div class="stat-label">Format</div>
-          </div>
-        </div>
-
         <div class="info-grid">
           <div class="info-card">
             <h3>📝 Title</h3>
@@ -719,7 +704,7 @@
                   <span class="contact-icon">📱</span>
                   <div class="contact-info">
                     <div class="contact-type">WhatsApp</div>
-                    <div class="contact-value">+62 812-3456-7890</div>
+                    <div class="contact-value">+62 813-4440-6998</div>
                   </div>
                   <!-- <button class="contact-btn whatsapp" onclick="openWhatsApp()">
                     Chat Now
@@ -1107,12 +1092,50 @@ Terima kasih.`);
         }
       }
 
-      function goBack() {
+      async function goBack() {
+        console.log("⬅️ Going back to dashboard...");
+
         try {
-          window.history.back();
-        } catch (error) {
-          // Fallback: reload dashboard
+          // Coba gunakan electron API dulu
+          if (window.electronAPI && window.electronAPI.navigateToDashboard) {
+            console.log("🚀 Using Electron API for navigation...");
+            const result = await window.electronAPI.navigateToDashboard();
+
+            if (result.success) {
+              console.log("✅ Successfully navigated back to dashboard");
+              return;
+            } else {
+              console.error("❌ Electron navigation failed:", result.message);
+            }
+          } else {
+            console.warn("⚠️ Electron navigation API not available");
+            console.log(
+              "Available APIs:",
+              Object.keys(window.electronAPI || {})
+            );
+          }
+
+          // Fallback methods
+          console.log("🔄 Trying fallback navigation methods...");
+
+          // Method 1: Browser history
+          if (window.history.length > 1) {
+            console.log("📜 Trying window.history.back()...");
+            window.history.back();
+            return;
+          }
+
+          // Method 2: Direct navigation
+          console.log("🎯 Trying direct navigation...");
           window.location.href = "dashboard.html";
+        } catch (error) {
+          console.error("❌ All navigation methods failed:", error);
+
+          // Emergency alert
+          alert(
+            "Navigation failed. The app may need to be restarted.\n\nError: " +
+              error.message
+          );
         }
       }
 

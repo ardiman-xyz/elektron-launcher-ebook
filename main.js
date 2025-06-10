@@ -12,6 +12,9 @@ let ebookWindow;
 let license; // SimpleLicense instance
 let deviceManager;
 let simpleDecryptor;
+console.log("🌍 Environment loaded:");
+console.log("📡 API URL:", process.env.LICENSE_API_URL || "Default URL");
+console.log("🏃 NODE_ENV:", process.env.NODE_ENV || "development");
 
 app.whenReady().then(async () => {
   console.log("✅ App ready");
@@ -26,9 +29,11 @@ app.whenReady().then(async () => {
 
 async function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 500,
-    height: 700,
-    resizable: false,
+    width: 600, // Dari 500 menjadi 600
+    height: 800, // Dari 700 menjadi 800
+    minWidth: 550, // Minimum width
+    minHeight: 700, // Minimum height
+    resizable: true,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -304,6 +309,40 @@ ipcMain.handle("open-external", async (event, url) => {
     await shell.openExternal(url);
     return { success: true };
   } catch (error) {
+    return { success: false, message: error.message };
+  }
+});
+
+ipcMain.handle("navigate-to-info", async () => {
+  try {
+    console.log("📖 Navigating to info page...");
+    mainWindow.loadFile("app/info.html");
+    return { success: true };
+  } catch (error) {
+    console.error("❌ Error navigating to info:", error);
+    return { success: false, message: error.message };
+  }
+});
+
+ipcMain.handle("navigate-to-dashboard", async () => {
+  try {
+    console.log("📊 Navigating to dashboard...");
+    mainWindow.loadFile("app/dashboard.html");
+    return { success: true };
+  } catch (error) {
+    console.error("❌ Error navigating to dashboard:", error);
+    return { success: false, message: error.message };
+  }
+});
+
+// Navigate to activation page
+ipcMain.handle("navigate-to-activation", async () => {
+  try {
+    console.log("🔑 Navigating to activation page...");
+    mainWindow.loadFile("app/activation.html");
+    return { success: true };
+  } catch (error) {
+    console.error("❌ Error navigating to activation:", error);
     return { success: false, message: error.message };
   }
 });
