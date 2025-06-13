@@ -464,7 +464,6 @@
 
       <div class="links">
         <a href="#" onclick="showHelp()">Need Help?</a>
-        <a href="#" onclick="skipActivation()">Skip (Demo Mode)</a>
       </div>
     </div>
 
@@ -861,30 +860,23 @@
       function showHelp() {
         const helpMessage = `📋 License Activation Help
 
-License Key Format:
-• Format: XXXX-XXXX-XXXX-XXXX (with hyphens for readability)
-• Contains letters and numbers only
-• Case insensitive (will be converted to uppercase)
-• Hyphens are automatically added for display
+            License Key Format:
+            • Format: XXXX-XXXX-XXXX-XXXX (with hyphens for readability)
+            • Contains letters and numbers only
+            • Case insensitive (will be converted to uppercase)
+            • Hyphens are automatically added for display
 
-Internet Connection:
-• Required for license activation and verification
-• Check your WiFi or ethernet connection
-• Disable VPN if activation fails
-• Contact support if connection issues persist
+            Internet Connection:
+            • Required for license activation and verification
+            • Check your WiFi or ethernet connection
+            • Disable VPN if activation fails
+            • Contact support if connection issues persist
 
-Available Test Licenses:
-• DEMO-1234-5678-ABC (Demo license, 7 days)
-• DEMO-2024-TEST-DEMO (Demo license, 7 days)
-• TRIA-L202-4TES-TABC (Trial license, 30 days)
-• TRIA-L202-4DEM-ODEF (Trial license, 30 days)
-• FULL-2024-SAMP-LE123 (Full license, 1 year)
-
-Common Issues:
-• Check your internet connection (see status indicator)
-• Verify the license key is correct
-• Ensure you haven't exceeded device limit
-• Contact support if license is expired`;
+            Common Issues:
+            • Check your internet connection (see status indicator)
+            • Verify the license key is correct
+            • Ensure you haven't exceeded device limit
+            • Contact support if license is expired`;
 
         if (window.electronAPI && window.electronAPI.showMessage) {
           window.electronAPI.showMessage({
